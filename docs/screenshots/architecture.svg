@@ -1,58 +1,57 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" font-family="Inter, -apple-system, 'Segoe UI', sans-serif">
   <rect width="1200" height="620" fill="#f8fafc"/>
 
-  <!-- Browser / Frontend -->
+  <!-- Frontend -->
   <rect x="60" y="80" width="300" height="440" rx="18" fill="#ffffff" stroke="#e2e8f0"/>
-  <text x="210" y="120" font-size="16" fill="#0f172a" text-anchor="middle" font-weight="700">🖥  Frontend</text>
-  <text x="210" y="144" font-size="12" fill="#64748b" text-anchor="middle">React 19 · Vite · Tailwind v4</text>
-  <line x1="80" y1="160" x2="340" y2="160" stroke="#f1f5f9"/>
-  <g font-size="13" fill="#334155">
-    <text x="90" y="196">📊  Dashboard</text>
-    <text x="90" y="232">➕  Create Payment</text>
-    <text x="90" y="268">📋  Transactions</text>
-    <text x="90" y="304">📢  Webhook Tester</text>
-  </g>
-  <rect x="90" y="340" width="240" height="150" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-dasharray="5 4"/>
-  <text x="210" y="400" font-size="12" fill="#64748b" text-anchor="middle">Live updates via</text>
-  <text x="210" y="424" font-size="14" fill="#118eea" text-anchor="middle" font-weight="700">Server-Sent Events</text>
-  <text x="210" y="450" font-size="12" fill="#94a3b8" text-anchor="middle">/api/events</text>
+  <g transform="translate(192,104) scale(1.1666666666666667)" fill="none" stroke="#118eea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l18 0"/><path d="M3 10l18 0"/><path d="M5 6l7 -3l7 3"/><path d="M4 10l0 11"/><path d="M20 10l0 11"/><path d="M8 14l0 3"/><path d="M12 14l0 3"/><path d="M16 14l0 3"/></g>
+  <text x="210" y="150" font-size="16" fill="#0f172a" text-anchor="middle" font-weight="700">Frontend</text>
+  <text x="210" y="172" font-size="12" fill="#64748b" text-anchor="middle">React 19 · Vite · Tailwind v4</text>
+  <line x1="80" y1="188" x2="340" y2="188" stroke="#f1f5f9"/>
+  <g transform="translate(92,210) scale(0.75)" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v8h-6z"/><path d="M4 16h6v4h-6z"/><path d="M14 12h6v8h-6z"/><path d="M14 4h6v4h-6z"/></g><text x="120" y="224" font-size="13" fill="#334155">Dashboard</text>
+  <g transform="translate(92,244) scale(0.75)" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14"/><path d="M5 12l14 0"/></g><text x="120" y="258" font-size="13" fill="#334155">Create Payment</text>
+  <g transform="translate(92,278) scale(0.75)" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l11 0"/><path d="M9 12l11 0"/><path d="M9 18l11 0"/><path d="M5 6l0 .01"/><path d="M5 12l0 .01"/><path d="M5 18l0 .01"/></g><text x="120" y="292" font-size="13" fill="#334155">Transactions</text>
+  <g transform="translate(92,312) scale(0.75)" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a3 3 0 0 1 0 6"/><path d="M10 8v11a1 1 0 0 1 -1 1h-1a1 1 0 0 1 -1 -1v-5"/><path d="M12 8h0l4 -3a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1l-4 -3h-4a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h4z"/></g><text x="120" y="326" font-size="13" fill="#334155">Webhook Tester</text>
+  <rect x="90" y="352" width="240" height="148" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-dasharray="5 4"/>
+  <g transform="translate(196,386) scale(0.9166666666666666)" fill="none" stroke="#118eea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></g>
+  <text x="210" y="432" font-size="12" fill="#64748b" text-anchor="middle">Live updates via</text>
+  <text x="210" y="456" font-size="14" fill="#118eea" text-anchor="middle" font-weight="700">Server-Sent Events</text>
+  <text x="210" y="478" font-size="12" fill="#94a3b8" text-anchor="middle">/api/events</text>
 
   <!-- Backend -->
   <rect x="450" y="80" width="320" height="440" rx="18" fill="#ffffff" stroke="#e2e8f0"/>
-  <text x="610" y="120" font-size="16" fill="#0f172a" text-anchor="middle" font-weight="700">⚙️  Backend (Express)</text>
-  <text x="610" y="144" font-size="12" fill="#64748b" text-anchor="middle">REST API · SNAP signing</text>
-  <line x1="470" y1="160" x2="750" y2="160" stroke="#f1f5f9"/>
-  <g font-size="12" fill="#334155" font-family="monospace">
-    <text x="470" y="192">POST /api/payments</text>
-    <text x="470" y="216">POST /:ref/query · /cancel</text>
-    <text x="470" y="240">POST /api/webhooks/dana</text>
-    <text x="470" y="264">GET  /api/payments/stats</text>
-    <text x="470" y="288">GET  /api/events (SSE)</text>
-  </g>
-  <rect x="470" y="308" width="280" height="192" rx="12" fill="#eef4ff" stroke="#bcd0ff"/>
-  <text x="610" y="338" font-size="13" fill="#0957a8" text-anchor="middle" font-weight="700">🔐 SNAP Signature Layer</text>
-  <text x="490" y="368" font-size="12" fill="#334155">• HMAC-SHA512 access-token</text>
-  <text x="490" y="392" font-size="12" fill="#334155">• RSA-SHA256 request signing</text>
-  <text x="490" y="416" font-size="12" fill="#334155">• Webhook verify (RSA)</text>
-  <text x="490" y="440" font-size="12" fill="#334155">• Mock mode (no network)</text>
-  <text x="490" y="466" font-size="12" fill="#64748b">• In-memory store + event bus</text>
+  <g transform="translate(588,104) scale(1.1666666666666667)" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z"/><path d="M3 12m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v2a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z"/><path d="M7 8l0 .01"/><path d="M7 16l0 .01"/></g>
+  <text x="610" y="150" font-size="16" fill="#0f172a" text-anchor="middle" font-weight="700">Backend (Express)</text>
+  <text x="610" y="172" font-size="12" fill="#64748b" text-anchor="middle">REST API · SNAP signing</text>
+  <line x1="470" y1="188" x2="750" y2="188" stroke="#f1f5f9"/>
+  <text x="470" y="216" font-size="12" fill="#334155" font-family="monospace">POST /api/payments</text>
+  <text x="470" y="240" font-size="12" fill="#334155" font-family="monospace">POST /:ref/query · /cancel · /refund</text>
+  <text x="470" y="264" font-size="12" fill="#334155" font-family="monospace">POST /api/disbursements</text>
+  <text x="470" y="288" font-size="12" fill="#334155" font-family="monospace">POST /api/webhooks/dana</text>
+  <text x="470" y="312" font-size="12" fill="#334155" font-family="monospace">GET  /api/events (SSE)</text>
+  <rect x="470" y="332" width="280" height="168" rx="12" fill="#eef4ff" stroke="#bcd0ff"/>
+  <g transform="translate(490,350) scale(0.75)" fill="none" stroke="#0957a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"/><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"/><path d="M8 11v-4a4 4 0 1 1 8 0v4"/></g>
+  <text x="516" y="364" font-size="13" fill="#0957a8" font-weight="700">SNAP Signature Layer</text>
+  <text x="490" y="392" font-size="12" fill="#334155">• HMAC-SHA512 access-token</text>
+  <text x="490" y="416" font-size="12" fill="#334155">• RSA-SHA256 request signing</text>
+  <text x="490" y="440" font-size="12" fill="#334155">• Webhook verify (RSA)</text>
+  <text x="490" y="464" font-size="12" fill="#334155">• Mock mode (no network)</text>
+  <text x="490" y="488" font-size="12" fill="#64748b">• Memory or MySQL (Sequelize)</text>
 
   <!-- DANA -->
   <rect x="870" y="80" width="270" height="440" rx="18" fill="#ffffff" stroke="#e2e8f0"/>
   <rect x="925" y="104" width="160" height="58" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
   <g transform="translate(945,124) scale(0.315)"><path fill="#008ceb" fill-rule="evenodd" d="M151,82.84c7.26.52,15.72-5.12,18.7-8.34,10.36-11.21,10.61-27.42.18-39.16-3.88-4.37-13-9.2-18.77-8.52H130.22V82.77l20.83.07ZM142,70.72V38.87a75,75,0,0,1,9.82,0,15.22,15.22,0,0,1,7.13,2.76c12,8.2,7,27.75-7.33,29.06A71.77,71.77,0,0,1,142,70.72Z"/><path fill="#008ceb" fill-rule="evenodd" d="M334.39,82.94H346.3V70.88h23.63l.07,12h11.91V63c0-6,.5-13.48-1-18.91a23.62,23.62,0,0,0-45.49-.25c-1.6,5.36-1.06,13.05-1.06,19,0,6.72-.07,13.48,0,20.2Zm11.92-24.19c-.07-5-.6-10.35,1.75-14.2a11.61,11.61,0,0,1,10.15-5.77,11.79,11.79,0,0,1,10.08,5.82c2.32,4,1.77,9,1.71,14.16Z"/><path fill="#008ceb" fill-rule="evenodd" d="M198.19,82.93h11.87c0-2.52-.32-10.23.11-12.06h23.54l.08,12.05h11.89c-.06-6.68,0-13.35,0-20,0-5.7.53-13.86-1-18.92a23.63,23.63,0,0,0-45.49-.23c-1.59,5.2-1.05,13.15-1.05,18.94,0,6.68-.15,13.53,0,20.19Zm11.88-24.18c-.08-5-.59-10.42,1.76-14.19a11.71,11.71,0,0,1,20.23,0c2.33,4,1.77,9.08,1.73,14.17Z"/><path fill="#008ceb" fill-rule="evenodd" d="M266.57,48.67,266.4,57c0,7-.34,20.07,0,25.76h11.64c.27-4-.42-32.41.31-33.32,0-5.52,5.77-10.66,11.59-10.68A11.62,11.62,0,0,1,298.06,42c1.48,1.35,3.75,4.43,3.71,7.54.54.31.11,30,.28,33.29H313.7l-.09-33.95c.29-2.66-1.31-6.77-2.34-8.85A23.56,23.56,0,0,0,269,39.67C268,41.72,266.32,45.94,266.57,48.67Z"/><circle fill="#008ceb" cx="54.61" cy="54.61" r="54.61"/><path fill="#fefefe" d="M86.43,54.84V70.21c0,1-.43,1.21-1.27.72a28.08,28.08,0,0,0-3.5-1.78,23.73,23.73,0,0,0-11.49-1.53,55.06,55.06,0,0,0-12.44,3.12c-4,1.35-7.92,2.81-12,3.94a33.41,33.41,0,0,1-10.42,1.37,22.12,22.12,0,0,1-11-3.43A2.71,2.71,0,0,1,23,70.2Q23,55.1,23,40c0-.49,0-1.07.44-1.32s.89.16,1.27.41a21,21,0,0,0,12.15,3.6A32.4,32.4,0,0,0,45.94,41c4.16-1.29,8.18-3,12.27-4.45a74.14,74.14,0,0,1,9.77-3,21.21,21.21,0,0,1,16.73,3.09,3.67,3.67,0,0,1,1.75,3.27c0,5,0,10,0,15Z"/></g>
-  <text x="1005" y="264" font-size="16" fill="#0f172a" text-anchor="middle" font-weight="700">DANA Business API</text>
-  <text x="1005" y="288" font-size="12" fill="#64748b" text-anchor="middle">SNAP · QRIS MPM</text>
-  <line x1="890" y1="304" x2="1120" y2="304" stroke="#f1f5f9"/>
-  <g font-size="12" fill="#334155" font-family="monospace">
-    <text x="890" y="336">/authorization/v1.0/</text>
-    <text x="900" y="356">access-token/b2b</text>
-    <text x="890" y="386">/v1.0/qr/qr-mpm-generate</text>
-    <text x="890" y="410">/v1.0/qr/qr-mpm-query</text>
-    <text x="890" y="434">/v1.0/qr/qr-mpm-cancel</text>
-  </g>
-  <text x="1005" y="480" font-size="11" fill="#94a3b8" text-anchor="middle">api-sandbox.dana.id</text>
-  <text x="1005" y="498" font-size="11" fill="#94a3b8" text-anchor="middle">api.dana.id (prod)</text>
+  <text x="1005" y="200" font-size="16" fill="#0f172a" text-anchor="middle" font-weight="700">DANA Business API</text>
+  <text x="1005" y="222" font-size="12" fill="#64748b" text-anchor="middle">SNAP · QRIS MPM</text>
+  <line x1="890" y1="240" x2="1120" y2="240" stroke="#f1f5f9"/>
+  <text x="890" y="272" font-size="12" fill="#334155" font-family="monospace">/authorization/v1.0/</text>
+  <text x="902" y="292" font-size="12" fill="#334155" font-family="monospace">access-token/b2b</text>
+  <text x="890" y="322" font-size="12" fill="#334155" font-family="monospace">/v1.0/qr/qr-mpm-generate</text>
+  <text x="890" y="346" font-size="12" fill="#334155" font-family="monospace">/v1.0/qr/qr-mpm-query</text>
+  <text x="890" y="370" font-size="12" fill="#334155" font-family="monospace">/v1.0/qr/qr-mpm-cancel</text>
+  <text x="890" y="394" font-size="12" fill="#334155" font-family="monospace">/v1.0/debit/refund</text>
+  <text x="1005" y="440" font-size="11" fill="#94a3b8" text-anchor="middle">api-sandbox.dana.id</text>
+  <text x="1005" y="458" font-size="11" fill="#94a3b8" text-anchor="middle">api.dana.id (prod)</text>
 
   <!-- arrows -->
   <defs>
@@ -70,5 +69,5 @@
   <text x="818" y="230" font-size="11" fill="#64748b" text-anchor="middle">signed</text>
   <text x="818" y="308" font-size="11" fill="#64748b" text-anchor="middle">webhook</text>
 
-  <text x="600" y="570" font-size="12" fill="#94a3b8" text-anchor="middle">Express backend proxies DANA; frontend talks only to the backend via /api</text>
+  <text x="600" y="570" font-size="12" fill="#94a3b8" text-anchor="middle">Express backend proxies DANA; the frontend talks only to the backend via /api</text>
 </svg>

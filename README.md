@@ -60,8 +60,9 @@
 ## 🖼 Screenshots
 
 > These are high-fidelity **UI mockups** (embedded as SVG). The QR codes are
-> **real, scannable** QRIS payloads and the DANA mark is the official brand logo.
-> Regenerate them with `npm run screenshots --prefix backend`.
+> **real, scannable** QRIS payloads, the DANA mark is the official brand logo,
+> and all icons are **vector SVG** (Tabler outline set) — no emoji glyphs.
+> Regenerate them with `npm run screenshots`.
 
 ### Dashboard — live stats, transactions & payment creator
 ![Dashboard](docs/screenshots/dashboard.svg)
