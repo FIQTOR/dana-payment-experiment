@@ -81,6 +81,8 @@ export default function PaymentDetailModal({ open, onClose, transaction, onUpdat
   };
 
   const isPending = t.status === 'PENDING';
+  const refundableLeft = (t.amount?.value || 0) - (t.refundedAmount || 0);
+  const canRefund = ['SUCCESS', 'REFUNDED'].includes(t.status) && refundableLeft > 0;
 
   return (
     <Modal
@@ -110,14 +112,14 @@ export default function PaymentDetailModal({ open, onClose, transaction, onUpdat
               Cancel
             </button>
           )}
-          {t.status === 'SUCCESS' && (
+          {canRefund && (
             <button
               onClick={() => action('refund')}
               disabled={busy}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-100 disabled:opacity-60"
             >
               {busy === 'refund' ? <IconLoader2 size={16} className="animate-spin" /> : <IconReceiptRefund size={16} />}
-              Refund
+              {t.refundedAmount > 0 ? 'Refund remainder' : 'Refund'}
             </button>
           )}
         </div>
@@ -160,6 +162,13 @@ export default function PaymentDetailModal({ open, onClose, transaction, onUpdat
           <Row label="Reference No" value={t.partnerReferenceNo} mono />
           <Row label="DANA Ref No" value={t.danaReferenceNo || '—'} mono />
           <Row label="Amount" value={formatIDR(t.amount?.value)} />
+          {t.refundedAmount > 0 && (
+            <>
+              <Row label="Refunded" value={formatIDR(t.refundedAmount)} />
+              <Row label="Refundable left" value={formatIDR((t.amount?.value || 0) - t.refundedAmount)} />
+            </>
+          )}
+          {t.customerName && <Row label="Customer" value={t.customerName} />}
           <Row label="Created" value={formatDateTime(t.createdAt)} />
           <Row label="Valid until" value={formatDateTime(t.validUntil)} />
           {t.payer && (

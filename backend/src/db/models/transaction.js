@@ -8,6 +8,8 @@ import { DataTypes } from 'sequelize';
  * exactly, keeping the two backends swappable.
  */
 export function defineTransaction(sequelize) {
+  const isSqlite = sequelize.getDialect() === 'sqlite';
+
   const Transaction = sequelize.define(
     'Transaction',
     {
@@ -37,28 +39,38 @@ export function defineTransaction(sequelize) {
         allowNull: false,
         field: 'amount_value',
       },
+      refundedAmount: {
+        type: DataTypes.DECIMAL(20, 2),
+        allowNull: false,
+        defaultValue: 0,
+        field: 'refunded_amount',
+      },
       currency: {
         type: DataTypes.STRING(8),
         allowNull: false,
         defaultValue: 'IDR',
       },
-      status: {
-        type: DataTypes.ENUM(
-          'PENDING',
-          'SUCCESS',
-          'FAILED',
-          'EXPIRED',
-          'CANCELLED',
-          'REFUNDED',
-        ),
-        allowNull: false,
-        defaultValue: 'PENDING',
-      },
+      // ENUM is MySQL-specific; SQLite uses a plain string with app-level checks.
+      status: isSqlite
+        ? { type: DataTypes.STRING(16), allowNull: false, defaultValue: 'PENDING' }
+        : {
+            type: DataTypes.ENUM(
+              'PENDING',
+              'SUCCESS',
+              'FAILED',
+              'EXPIRED',
+              'CANCELLED',
+              'REFUNDED',
+            ),
+            allowNull: false,
+            defaultValue: 'PENDING',
+          },
       qrContent: { type: DataTypes.TEXT, allowNull: true, field: 'qr_content' },
       qrUrl: { type: DataTypes.STRING(512), allowNull: true, field: 'qr_url' },
       validUntil: { type: DataTypes.DATE, allowNull: true, field: 'valid_until' },
       payer: { type: DataTypes.JSON, allowNull: true },
       description: { type: DataTypes.STRING(255), allowNull: true },
+      customerName: { type: DataTypes.STRING(128), allowNull: true, field: 'customer_name' },
       history: { type: DataTypes.JSON, allowNull: false, defaultValue: [] },
     },
     {

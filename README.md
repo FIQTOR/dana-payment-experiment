@@ -6,7 +6,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg" alt="Node >= 20">
   <a href="https://github.com/FIQTOR/dana-payment-experiment/actions/workflows/ci.yml"><img src="https://github.com/FIQTOR/dana-payment-experiment/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/tests-41%20passing-success.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/tests-57%20passing-success.svg" alt="Tests">
   <img src="https://img.shields.io/badge/express-4.x-000000.svg" alt="Express 4">
   <img src="https://img.shields.io/badge/react-19-61dafb.svg" alt="React 19">
   <img src="https://img.shields.io/badge/vite-8-646cff.svg" alt="Vite 8">
@@ -33,7 +33,7 @@
 - [🧰 Tech stack](#-tech-stack)
 - [🚀 Quick start](#-quick-start)
 - [🔁 Payment lifecycle](#-payment-lifecycle)
-- [💾 Persistence (MySQL)](#-persistence-mysql)
+- [💾 Persistence (MySQL / SQLite)](#-persistence-mysql--sqlite)
 - [🐳 Docker](#-docker)
 - [🔎 Connection self-test](#-connection-self-test)
 - [🔐 Going live (sandbox / production)](#-going-live-sandbox--production)
@@ -52,8 +52,8 @@
 | Area | What you get |
 | --- | --- |
 | **Backend** | Express.js REST API · **SNAP request signing** (RSA-SHA256) · **HMAC-SHA512** access-token flow · QRIS MPM create / query / cancel · **refund** · **bank disbursement** · webhook receiver with signature verification · Server-Sent Events for live updates · zod validation · rate limiting + helmet · **in-memory or MySQL (Sequelize)** storage |
-| **Frontend** | React 19 + Vite 8 + **TailwindCSS v4** + **Tabler Icons** · dashboard with live stats · payment creator with QR preview · filterable transaction list · detail modal (QR / timeline / query / cancel / refund / simulation) · webhook tester |
-| **DX** | **Mock mode** (no network) · **`npm run dana:ping`** self-test · keypair generator · **41 automated tests** (Vitest + Supertest) · Docker Compose · Postman collection · hot reload · CI workflow |
+| **Frontend** | React 19 + Vite 8 + **TailwindCSS v4** + **Tabler Icons** · dashboard with live stats · payment creator with QR preview · filterable transaction list · detail modal (QR / timeline / query / cancel / refund / simulation) · **disbursement** tab (bank inquiry + transfer) · webhook tester |
+| **DX** | **Mock mode** (no network) · **`npm run dana:ping`** self-test · keypair generator · **57 automated tests** (Vitest + Supertest) · Docker Compose · Postman collection · hot reload · CI workflow |
 
 ---
 
@@ -152,14 +152,15 @@ Then open **<http://localhost:5173>** 🎉
 2. **Display** → dashboard shows the QR, amount, and validity window.
 3. **Pay** → via *Experiment controls* (`POST /:ref/simulate`) in mock mode, or a real DANA webhook.
 4. **Update** → the dashboard reflects the new status instantly over SSE; stats recompute.
-5. **Refund / Disburse** → refund a settled payment, or transfer funds to a bank account.
+5. **Refund / Disburse** → refund a settled payment (full **or partial** — the
+   refundable balance is tracked), or transfer funds to a bank account.
 
 ---
 
-## 💾 Persistence (MySQL)
+## 💾 Persistence (MySQL / SQLite)
 
 By default the project uses an **in-memory store** (zero setup). To persist
-transactions across restarts, enable **MySQL via Sequelize**:
+transactions across restarts, enable the **Sequelize** backend:
 
 ```bash
 # 1. Have a MySQL server running, then create the database:
@@ -167,6 +168,7 @@ transactions across restarts, enable **MySQL via Sequelize**:
 
 # 2. Enable it in backend/.env
 DB_ENABLED=true
+DB_DIALECT=mysql          # or "sqlite" for a zero-dependency local file
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=dana_payments
@@ -174,12 +176,20 @@ DB_USER=root
 DB_PASSWORD=yourpassword
 ```
 
+Prefer no server? Use **SQLite**:
+
+```env
+DB_ENABLED=true
+DB_DIALECT=sqlite
+DB_STORAGE=./dana.sqlite   # or ":memory:"
+```
+
 On boot the schema is created/updated automatically (`sequelize.sync`). Check the
 active backend any time:
 
 ```bash
 curl -s http://localhost:4000/api/webhooks/config | jq .data.storage
-# → "mysql"  or  "memory"
+# → "mysql" | "sqlite" | "memory"
 ```
 
 > If the DB is enabled but unreachable, the app logs the error and **falls back to
@@ -300,7 +310,7 @@ Base URL: `http://localhost:4000/api`
 | `GET` | `/payments/:ref/qr.svg` | QR image (SVG) |
 | `POST` | `/payments/:ref/query` | Poll DANA for the latest status |
 | `POST` | `/payments/:ref/cancel` | Cancel a pending payment |
-| `POST` | `/payments/:ref/refund` | Refund a settled (SUCCESS) payment |
+| `POST` | `/payments/:ref/refund` | Refund a payment (full or partial) |
 | `POST` | `/payments/:ref/simulate` | 🧪 Force a status (mock mode only) |
 | `GET` | `/payments/stats` | Aggregate stats |
 
@@ -430,7 +440,8 @@ dana-payment-experiment/
 
 ## ✅ Testing
 
-41 tests covering signature math, the store, and every endpoint (via Supertest):
+57 tests covering signature math, the store (memory **and** SQLite/Sequelize),
+the DANA service, and every endpoint (via Supertest):
 
 ```bash
 cd backend
@@ -440,11 +451,16 @@ npm test
 ```
  ✓ tests/signature.test.js   (8 tests)
  ✓ tests/store.test.js       (9 tests)
- ✓ tests/api.test.js         (24 tests)
+ ✓ tests/service.test.js     (8 tests)
+ ✓ tests/api.test.js         (27 tests)
+ ✓ tests/db.test.js          (6 tests)   ← runs against in-memory SQLite
 
- Test Files  3 passed (3)
-      Tests  41 passed (41)
+ Test Files  5 passed (5)
+      Tests  57 passed (57)
 ```
+
+The suite runs fully **offline in mock mode** — no credentials, network, or
+database server needed (the DB tests use in-memory SQLite).
 
 The suite runs fully **offline in mock mode** — no credentials or network needed.
 

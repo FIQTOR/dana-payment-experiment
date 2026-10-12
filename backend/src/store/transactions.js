@@ -1,6 +1,6 @@
 import { EventEmitter } from 'node:events';
 import { nanoid } from 'nanoid';
-import { isDbEnabled, getTransactionModel } from '../db/sequelize.js';
+import { isDbEnabled, getTransactionModel, getSequelize } from '../db/sequelize.js';
 
 /**
  * Transaction store with an event bus and two interchangeable backends:
@@ -14,8 +14,10 @@ import { isDbEnabled, getTransactionModel } from '../db/sequelize.js';
  * {
  *   id, partnerReferenceNo, merchantRefNo, danaReferenceNo,
  *   amount: { value: number, currency: string },
+ *   refundedAmount: number,
  *   status, // PENDING | SUCCESS | FAILED | EXPIRED | CANCELLED | REFUNDED
- *   qrContent, qrUrl, validUntil, payer, description, createdAt, updatedAt, history[]
+ *   qrContent, qrUrl, validUntil, payer, description, customerName,
+ *   createdAt, updatedAt, history[]
  * }
  */
 export const store = new EventEmitter();
@@ -38,12 +40,14 @@ function rowToTxn(row) {
     merchantRefNo: j.merchantRefNo,
     danaReferenceNo: j.danaReferenceNo,
     amount: { value: Number(j.amountValue), currency: j.currency },
+    refundedAmount: Number(j.refundedAmount) || 0,
     status: j.status,
     qrContent: j.qrContent,
     qrUrl: j.qrUrl,
     validUntil: j.validUntil ? new Date(j.validUntil).toISOString() : null,
     payer: j.payer || null,
     description: j.description,
+    customerName: j.customerName || null,
     createdAt: new Date(j.createdAt).toISOString(),
     updatedAt: new Date(j.updatedAt).toISOString(),
     history: Array.isArray(j.history) ? j.history : [],
@@ -68,12 +72,14 @@ export async function createTransaction(input, { silent = true } = {}) {
       value: Number(input.amount.value),
       currency: input.amount.currency || 'IDR',
     },
+    refundedAmount: 0,
     status: 'PENDING',
     qrContent: null,
     qrUrl: null,
     validUntil: input.validUntil || new Date(Date.now() + 30 * 60_000).toISOString(),
     payer: null,
     description: input.description || 'DANA payment',
+    customerName: input.customerName || null,
     createdAt: now,
     updatedAt: now,
     history: [{ status: 'PENDING', at: now, note: 'Transaction created' }],
@@ -90,6 +96,7 @@ export async function createTransaction(input, { silent = true } = {}) {
       status: txn.status,
       validUntil: txn.validUntil,
       description: txn.description,
+      customerName: txn.customerName,
       history: txn.history,
     });
     const result = rowToTxn(created);
@@ -165,6 +172,8 @@ export async function updateTransaction(
     if (patch.qrUrl !== undefined) updates.qrUrl = patch.qrUrl;
     if (patch.payer !== undefined) updates.payer = patch.payer;
     if (patch.description !== undefined) updates.description = patch.description;
+    if (patch.refundedAmount !== undefined) updates.refundedAmount = patch.refundedAmount;
+    if (patch.customerName !== undefined) updates.customerName = patch.customerName;
 
     let history = current.history;
     if (patch.status) {
@@ -200,21 +209,25 @@ export async function updateTransaction(
 export async function stats() {
   if (usingDb()) {
     const Model = getTransactionModel();
-    const rows = await Model.findAll({ attributes: ['status', 'amountValue', 'currency'] });
+    const rows = await Model.findAll({
+      attributes: ['status', 'amountValue', 'refundedAmount', 'currency'],
+    });
     const byStatus = rows.reduce((acc, r) => {
       const s = r.get('status');
       acc[s] = (acc[s] || 0) + 1;
       return acc;
     }, {});
     const successValue = rows
-      .filter((r) => r.get('status') === 'SUCCESS')
+      .filter((r) => ['SUCCESS', 'REFUNDED'].includes(r.get('status')))
       .reduce((sum, r) => sum + Number(r.get('amountValue') || 0), 0);
+    const refundedValue = rows.reduce((sum, r) => sum + Number(r.get('refundedAmount') || 0), 0);
     return {
       total: rows.length,
       byStatus,
       successValue,
+      refundedValue,
       currency: rows[0]?.get('currency') || 'IDR',
-      backend: 'mysql',
+      backend: getSequelize().getDialect(),
     };
   }
 
@@ -224,12 +237,14 @@ export async function stats() {
     return acc;
   }, {});
   const successValue = all
-    .filter((t) => t.status === 'SUCCESS')
+    .filter((t) => ['SUCCESS', 'REFUNDED'].includes(t.status))
     .reduce((sum, t) => sum + (Number(t.amount?.value) || 0), 0);
+  const refundedValue = all.reduce((sum, t) => sum + (Number(t.refundedAmount) || 0), 0);
   return {
     total: all.length,
     byStatus,
     successValue,
+    refundedValue,
     currency: all[0]?.amount?.currency || 'IDR',
     backend: 'memory',
   };

@@ -49,6 +49,12 @@ export const api = {
     request(`/payments/${ref}/simulate`, { method: 'POST', body: JSON.stringify(payload) }),
   stats: () => request('/payments/stats'),
 
+  // Disbursements
+  inquiryBank: (payload) =>
+    request('/disbursements/inquiry', { method: 'POST', body: JSON.stringify(payload) }),
+  createDisbursement: (payload) =>
+    request('/disbursements', { method: 'POST', body: JSON.stringify(payload) }),
+
   // Public webhook URL helper
   webhookUrl: () => `${window.location.origin}/api/webhooks/dana`,
 };

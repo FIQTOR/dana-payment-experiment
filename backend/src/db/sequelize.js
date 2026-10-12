@@ -3,27 +3,43 @@ import config from '../config/index.js';
 import { defineTransaction } from './models/transaction.js';
 
 /**
- * MySQL connection via Sequelize. Only initialised when DB_ENABLED=true and a
- * host is configured. When disabled the app falls back to the in-memory store,
- * so the project still runs with zero setup.
+ * Database connection via Sequelize (MySQL by default, SQLite for tests).
+ * Only initialised when DB_ENABLED=true and a host is configured. When disabled
+ * the app falls back to the in-memory store, so the project still runs with no
+ * setup.
  */
 let sequelize = null;
 let Transaction = null;
 
 export function isDbEnabled() {
-  return Boolean(config.db.enabled && config.db.host);
+  // sqlite needs no host; mysql/others require one.
+  const needsHost = config.db.dialect !== 'sqlite';
+  return Boolean(config.db.enabled && (!needsHost || config.db.host));
 }
 
 export function getSequelize() {
   if (!sequelize) {
-    sequelize = new Sequelize(config.db.name, config.db.user, config.db.password, {
-      host: config.db.host,
-      port: config.db.port,
-      dialect: 'mysql',
+    const common = {
+      dialect: config.db.dialect,
       logging: config.db.logging ? (msg) => console.log(`[sql] ${msg}`) : false,
-      pool: { max: 5, min: 0, idle: 10_000 },
       define: { charset: 'utf8mb4', collate: 'utf8mb4_unicode_ci' },
-    });
+    };
+
+    if (config.db.dialect === 'sqlite') {
+      sequelize = new Sequelize({
+        ...common,
+        storage: config.db.storage,
+        define: {},
+      });
+    } else {
+      sequelize = new Sequelize(config.db.name, config.db.user, config.db.password, {
+        ...common,
+        host: config.db.host,
+        port: config.db.port,
+        pool: { max: 5, min: 0, idle: 10_000 },
+      });
+    }
+
     Transaction = defineTransaction(sequelize);
   }
   return sequelize;

@@ -111,10 +111,15 @@ class DanaService {
 
   /**
    * Create a QRIS MPM transaction.
-   * @param {{partnerReferenceNo:string, merchantRefNo?:string, amount:{value:number,currency?:string}, description?:string, validUpToMinutes?:number}} input
+   * @param {{partnerReferenceNo:string, merchantRefNo?:string, amount:{value:number,currency?:string}, description?:string, customerName?:string, validUpToMinutes?:number}} input
    */
   async createQrisTransaction(input) {
     const relPath = '/v1.0/qr/qr-mpm-generate';
+    const additionalInfo = {
+      description: input.description || 'DANA payment',
+    };
+    if (input.customerName) additionalInfo.customerName = input.customerName;
+
     const body = {
       partnerReferenceNo: input.partnerReferenceNo,
       merchantId: config.dana.merchantId,
@@ -124,9 +129,7 @@ class DanaService {
         value: Number(input.amount.value).toFixed(2),
         currency: input.amount.currency || 'IDR',
       },
-      additionalInfo: {
-        description: input.description || 'DANA payment',
-      },
+      additionalInfo,
       validUpTo: snapTimestampFromNow(input.validUpToMinutes || 30),
     };
 

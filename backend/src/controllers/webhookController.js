@@ -60,20 +60,24 @@ export async function handleDanaNotification(req, res, next) {
  * DANA async notification for disbursement (transfer-to-bank) status updates.
  * Configured in the dashboard under "Disburse to Bank Notify URL".
  */
-export async function handleDisbursementNotification(req, res) {
-  const body = req.body || {};
-  const verified = verifyNotification(req, body);
+export async function handleDisbursementNotification(req, res, next) {
+  try {
+    const body = req.body || {};
+    const verified = verifyNotification(req, body);
 
-  // Disbursements are fire-and-forget in this experiment; we acknowledge and log.
-  console.log(
-    `[webhook:disburse] ref=${body.partnerReferenceNo || body.originalReferenceNo || '-'} ` +
-      `status=${body.latestTransactionStatus || body.status || '-'} verified=${verified}`,
-  );
+    // Disbursements are fire-and-forget in this experiment; we acknowledge and log.
+    console.log(
+      `[webhook:disburse] ref=${body.partnerReferenceNo || body.originalReferenceNo || '-'} ` +
+        `status=${body.latestTransactionStatus || body.status || '-'} verified=${verified}`,
+    );
 
-  res.status(200).json({
-    responseCode: '2002500',
-    responseMessage: 'Successful',
-  });
+    res.status(200).json({
+      responseCode: '2002500',
+      responseMessage: 'Successful',
+    });
+  } catch (err) {
+    next(err);
+  }
 }
 
 /** Verify the inbound webhook signature (best-effort). */

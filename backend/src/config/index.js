@@ -34,11 +34,13 @@ export const config = {
   // Local simulation mode — do not hit the network.
   mockMode: String(process.env.DANA_MOCK_MODE || 'true').toLowerCase() === 'true',
 
-  // Optional MySQL persistence (Sequelize). Disabled by default → in-memory store.
+  // Optional DB persistence (Sequelize). Disabled by default → in-memory store.
   db: {
     enabled: String(process.env.DB_ENABLED || 'false').toLowerCase() === 'true',
+    dialect: process.env.DB_DIALECT || 'mysql',
     host: process.env.DB_HOST || '',
     port: num(process.env.DB_PORT) || 3306,
+    storage: process.env.DB_STORAGE || ':memory:', // sqlite only
     name: process.env.DB_NAME || 'dana_payments',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',

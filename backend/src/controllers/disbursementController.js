@@ -89,9 +89,28 @@ export async function inquireBankAccount(req, res, next) {
       });
     }
 
-    const accountName = config.mockMode
-      ? 'BUDI SANTOSO'
-      : (await danaService.inquireBankAccount(parsed.data)).accountName;
+    let accountName;
+    if (config.mockMode) {
+      accountName = 'BUDI SANTOSO';
+    } else {
+      const danaRes = await danaService.inquireBankAccount(parsed.data);
+      if (danaRes.responseCode && !/^2/.test(String(danaRes.responseCode))) {
+        return res.status(422).json({
+          success: false,
+          error: 'DANA_ERROR',
+          message: danaRes.responseMessage || 'DANA rejected the inquiry',
+          danaResponse: danaRes,
+        });
+      }
+      accountName = danaRes.accountName;
+      if (!accountName) {
+        return res.status(404).json({
+          success: false,
+          error: 'ACCOUNT_NOT_FOUND',
+          message: 'DANA did not return an account name for these details',
+        });
+      }
+    }
 
     res.json({
       success: true,

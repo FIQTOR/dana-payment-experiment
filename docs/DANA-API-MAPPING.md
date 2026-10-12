@@ -68,6 +68,7 @@ Implemented in `backend/src/services/danaService.js#_headers`.
 | `POST /api/payments` | `/v1.0/qr/qr-mpm-generate` | POST | Create a QRIS payment |
 | `POST /api/payments/:ref/query` | `/v1.0/qr/qr-mpm-query` | POST | Query status |
 | `POST /api/payments/:ref/cancel` | `/v1.0/qr/qr-mpm-cancel` | POST | Cancel payment |
+| `POST /api/payments/:ref/refund` | `/v1.0/debit/refund` | POST | Refund (full or partial) |
 
 ### Create payment — request body (subset)
 
@@ -78,7 +79,10 @@ Implemented in `backend/src/services/danaService.js#_headers`.
   "storeId": "...",
   "terminalId": "...",
   "amount": { "value": "25000.00", "currency": "IDR" },
-  "additionalInfo": { "description": "..." },
+  "additionalInfo": {
+    "description": "...",
+    "customerName": "..."                // optional; sent when provided
+  },
   "validUpTo": "2026-01-01T10:30:00+07:00"
 }
 ```
@@ -102,15 +106,60 @@ Other products follow the same SNAP shape and can be added the same way:
 | --- | --- |
 | e-Wallet debit (H2H) | `/v1.0/debit/payment-host-to-host` |
 | Account inquiry | `/v1.0/emoney/account-inquiry` |
-| Refund | `/v1.0/debit/refund` |
 | Balance inquiry | `/v1.0/emoney/balance-inquiry` |
+
+### Refund — request body (subset)
+
+```jsonc
+{
+  "partnerRefundNo": "RFD-...",              // your unique refund reference
+  "originalPartnerReferenceNo": "PRN-...",
+  "originalReferenceNo": "...",              // DANA's reference of the original txn
+  "merchantId": "...",
+  "refundAmount": { "value": "10000.00", "currency": "IDR" },
+  "reason": "customer request"
+}
+```
+
+**Partial refunds** are supported: the backend tracks the cumulative
+`refundedAmount` on the transaction and only flips the status to `REFUNDED` once
+the full amount has been refunded. The response includes:
+
+```jsonc
+{
+  "refund": {
+    "refundReferenceNo": "RFD-...",
+    "amount": 10000,
+    "refundedTotal": 10000,
+    "refundableRemaining": 15000,
+    "fullyRefunded": false
+  }
+}
+```
+
+---
+
+## 2b. Disbursement (transfer to bank)
+
+| Our route | DANA endpoint | Method | Purpose |
+| --- | --- | --- | --- |
+| `POST /api/disbursements` | `/v1.0/disbursement/transfer` | POST | Transfer funds to a bank account |
+| `POST /api/disbursements/inquiry` | `/v1.0/disbursement/bank-account-inquiry` | POST | Look up the account holder name |
+
+The transfer body includes a `notifyUrl` (`$PUBLIC_BASE_URL/api/webhooks/disburse`)
+so DANA reports the final transfer status asynchronously.
 
 ---
 
 ## 3. Webhooks (async notification)
 
-DANA POSTs status updates to the URL you register in the dashboard. We expose it
-at `POST /api/webhooks/dana`.
+DANA POSTs status updates to the URL you register in the dashboard. We expose two
+endpoints:
+
+| Our route | Dashboard field | Purpose |
+| --- | --- | --- |
+| `POST /api/webhooks/dana` | **Finish Payment URL** | Payment status updates |
+| `POST /api/webhooks/disburse` | **Disburse to Bank Notify URL** | Transfer status updates |
 
 Example payload:
 
@@ -158,6 +207,10 @@ Always branch on `responseCode`, not only HTTP status.
 | Signature math (SNAP) | `backend/src/utils/signature.js` |
 | DANA HTTP client + endpoints | `backend/src/services/danaService.js` |
 | Payment routes/controllers | `backend/src/routes/payments.js`, `backend/src/controllers/paymentController.js` |
+| Disbursement routes/controllers | `backend/src/routes/disbursements.js`, `backend/src/controllers/disbursementController.js` |
 | Webhook receiver + verify | `backend/src/controllers/webhookController.js` |
+| Transaction store (memory / DB) | `backend/src/store/transactions.js` |
+| DB models + connection | `backend/src/db/models/transaction.js`, `backend/src/db/sequelize.js` |
 | Key generation | `backend/src/utils/genKeyPair.js` |
+| Connection self-test | `backend/src/scripts/danaPing.js` |
 | Config / env | `backend/src/config/index.js`, `backend/.env.example` |

@@ -42,6 +42,7 @@ export async function createPayment(req, res, next) {
       merchantRefNo: input.merchantRefNo,
       amount: { value: input.amount, currency: input.currency },
       description: input.description,
+      customerName: input.customerName,
       validUntil: new Date(Date.now() + input.validUpToMinutes * 60_000).toISOString(),
     });
 
@@ -52,6 +53,7 @@ export async function createPayment(req, res, next) {
         merchantRefNo: input.merchantRefNo,
         amount: { value: input.amount, currency: input.currency },
         description: input.description,
+        customerName: input.customerName,
         validUpToMinutes: input.validUpToMinutes,
       });
     } catch (err) {
@@ -207,8 +209,10 @@ export async function cancelPayment(req, res, next) {
 }
 
 /**
- * POST /api/payments/:ref/refund — refund a settled payment.
- * Calls DANA's refund API and marks the transaction REFUNDED.
+ * POST /api/payments/:ref/refund — refund a settled payment (full or partial).
+ * Calls DANA's refund API and tracks the cumulative refunded amount:
+ *   - partial refunds keep the transaction SUCCESS with refundedAmount > 0
+ *   - once the full amount is refunded the status becomes REFUNDED
  */
 export async function refundPayment(req, res, next) {
   try {
@@ -223,7 +227,7 @@ export async function refundPayment(req, res, next) {
 
     const txn = await txStore.getTransaction(req.params.ref);
     if (!txn) return res.status(404).json({ success: false, error: 'NOT_FOUND' });
-    if (txn.status !== 'SUCCESS') {
+    if (!['SUCCESS', 'REFUNDED'].includes(txn.status)) {
       return res.status(409).json({
         success: false,
         error: 'INVALID_STATE',
@@ -231,12 +235,23 @@ export async function refundPayment(req, res, next) {
       });
     }
 
-    const refundAmount = parsed.data.amount ?? txn.amount.value;
-    if (refundAmount > txn.amount.value) {
+    const alreadyRefunded = Number(txn.refundedAmount) || 0;
+    const refundable = txn.amount.value - alreadyRefunded;
+    if (refundable <= 0) {
+      return res.status(409).json({
+        success: false,
+        error: 'ALREADY_REFUNDED',
+        message: 'This transaction has already been fully refunded',
+      });
+    }
+
+    const refundAmount = parsed.data.amount ?? refundable;
+    if (refundAmount > refundable) {
       return res.status(400).json({
         success: false,
         error: 'INVALID_AMOUNT',
-        message: 'Refund amount exceeds the original transaction amount',
+        message: `Refund amount exceeds the refundable balance (${refundable} ${txn.amount.currency})`,
+        refundable,
       });
     }
 
@@ -258,10 +273,17 @@ export async function refundPayment(req, res, next) {
       });
     }
 
+    const newRefunded = alreadyRefunded + refundAmount;
+    const fullyRefunded = newRefunded >= txn.amount.value;
     const updated = await txStore.updateTransaction(
       txn.partnerReferenceNo,
-      { status: 'REFUNDED' },
-      `Refunded ${refundAmount} ${txn.amount.currency} (${refundRefNo})`,
+      {
+        refundedAmount: newRefunded,
+        status: fullyRefunded ? 'REFUNDED' : 'SUCCESS',
+      },
+      fullyRefunded
+        ? `Fully refunded ${newRefunded} ${txn.amount.currency}`
+        : `Partially refunded ${refundAmount} ${txn.amount.currency} (${newRefunded}/${txn.amount.value})`,
     );
 
     res.json({
@@ -272,6 +294,9 @@ export async function refundPayment(req, res, next) {
           refundReferenceNo: refundRefNo,
           amount: refundAmount,
           currency: txn.amount.currency,
+          refundedTotal: newRefunded,
+          refundableRemaining: txn.amount.value - newRefunded,
+          fullyRefunded,
           danaResponse: danaRes,
         },
       },

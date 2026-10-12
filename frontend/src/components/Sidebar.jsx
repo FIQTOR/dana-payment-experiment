@@ -5,6 +5,7 @@ import {
   IconPlugConnected,
   IconBrandGithub,
   IconSpeakerphone,
+  IconBuildingBank,
 } from '@tabler/icons-react';
 import danaLogo from '../assets/dana-logo.svg';
 
@@ -12,6 +13,7 @@ const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: IconLayoutDashboard },
   { id: 'create', label: 'Create Payment', icon: IconPlus },
   { id: 'transactions', label: 'Transactions', icon: IconListDetails },
+  { id: 'disbursements', label: 'Disbursements', icon: IconBuildingBank },
   { id: 'webhook', label: 'Webhook Tester', icon: IconSpeakerphone },
 ];
 
@@ -71,13 +73,13 @@ export default function Sidebar({ active, onChange, connected }) {
           DANA API Docs
         </a>
         <a
-          href="https://github.com"
+          href="https://github.com/FIQTOR/dana-payment-experiment"
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
         >
           <IconBrandGithub size={15} />
-          Source
+          Source Code
         </a>
       </div>
     </aside>

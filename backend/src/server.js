@@ -28,9 +28,10 @@ app.use(
 app.use(morgan('dev'));
 
 // Rate limit the API (generous default; tighten via env in production).
+const rateMax = Number(process.env.RATE_LIMIT_MAX);
 const limiter = rateLimit({
   windowMs: 60_000,
-  max: Number(process.env.RATE_LIMIT_MAX || 120),
+  max: Number.isFinite(rateMax) && rateMax > 0 ? rateMax : 120,
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, error: 'RATE_LIMITED', message: 'Too many requests, slow down.' },
@@ -44,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (_req, res) => {
   res.json({
     name: 'DANA Payment Experiment API',
-    version: '1.1.0',
+    version: '1.2.0',
     mode: config.mockMode ? 'mock' : 'live',
     storage: usingDb() ? 'mysql' : 'memory',
     docs: '/api/webhooks/config',

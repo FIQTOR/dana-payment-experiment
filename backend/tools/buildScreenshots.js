@@ -183,6 +183,7 @@ function appShell({ active, title, subtitle, badge, body }) {
     ['dashboard', 'Dashboard', 'layout-dashboard'],
     ['create', 'Create Payment', 'plus'],
     ['transactions', 'Transactions', 'list'],
+    ['disbursements', 'Disbursements', 'building-bank'],
     ['webhook', 'Webhook Tester', 'speakerphone'],
   ];
   // small inline nav icons

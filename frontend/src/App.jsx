@@ -6,6 +6,7 @@ import CreatePaymentForm from './components/CreatePaymentForm';
 import TransactionList from './components/TransactionList';
 import PaymentDetailModal from './components/PaymentDetailModal';
 import WebhookTester from './components/WebhookTester';
+import DisbursementForm from './components/DisbursementForm';
 import { ToastProvider, useToast } from './components/Toast';
 import { api } from './lib/api';
 import { useTransactionEvents } from './hooks/useTransactionEvents';
@@ -109,6 +110,7 @@ function Dashboard() {
                 {tab === 'dashboard' && 'Payment Dashboard'}
                 {tab === 'create' && 'Create Payment'}
                 {tab === 'transactions' && 'Transactions'}
+                {tab === 'disbursements' && 'Disbursements'}
                 {tab === 'webhook' && 'Webhook Tester'}
               </h1>
               <p className="text-xs text-slate-500">
@@ -167,6 +169,8 @@ function Dashboard() {
               loading={loading}
             />
           )}
+
+          {tab === 'disbursements' && <DisbursementForm />}
 
           {tab === 'webhook' && <WebhookTester defaultRef={latestRef} />}
         </div>

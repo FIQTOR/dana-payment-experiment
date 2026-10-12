@@ -149,6 +149,41 @@ describe('API integration (mock mode)', () => {
       const res = await request(app).post(`/api/payments/${ref}/refund`).send({ amount: 99999 });
       expect(res.status).toBe(400);
     });
+
+    it('supports partial refunds and tracks the refundable balance', async () => {
+      const created = await createPayment({ amount: 25000 });
+      const ref = created.body.data.partnerReferenceNo;
+      await request(app).post(`/api/payments/${ref}/simulate`).send({ status: 'SUCCESS' });
+
+      // First partial refund
+      const r1 = await request(app).post(`/api/payments/${ref}/refund`).send({ amount: 10000 });
+      expect(r1.status).toBe(200);
+      expect(r1.body.data.transaction.status).toBe('SUCCESS'); // still refundable
+      expect(r1.body.data.transaction.refundedAmount).toBe(10000);
+      expect(r1.body.data.refund.fullyRefunded).toBe(false);
+      expect(r1.body.data.refund.refundableRemaining).toBe(15000);
+
+      // Second partial refund of the remainder → fully refunded
+      const r2 = await request(app).post(`/api/payments/${ref}/refund`).send({ amount: 15000 });
+      expect(r2.status).toBe(200);
+      expect(r2.body.data.transaction.status).toBe('REFUNDED');
+      expect(r2.body.data.refund.fullyRefunded).toBe(true);
+
+      // A third refund is rejected — nothing left
+      const r3 = await request(app).post(`/api/payments/${ref}/refund`).send({ amount: 1 });
+      expect(r3.status).toBe(409);
+    });
+
+    it('rejects a partial refund larger than the refundable balance (400)', async () => {
+      const created = await createPayment({ amount: 20000 });
+      const ref = created.body.data.partnerReferenceNo;
+      await request(app).post(`/api/payments/${ref}/simulate`).send({ status: 'SUCCESS' });
+      await request(app).post(`/api/payments/${ref}/refund`).send({ amount: 15000 });
+
+      const res = await request(app).post(`/api/payments/${ref}/refund`).send({ amount: 10000 });
+      expect(res.status).toBe(400);
+      expect(res.body.refundable).toBe(5000);
+    });
   });
 
   describe('stats', () => {
