@@ -43,6 +43,8 @@ export const api = {
     request('/payments', { method: 'POST', body: JSON.stringify(payload) }),
   queryPayment: (ref) => request(`/payments/${ref}/query`, { method: 'POST' }),
   cancelPayment: (ref) => request(`/payments/${ref}/cancel`, { method: 'POST' }),
+  refundPayment: (ref, payload = {}) =>
+    request(`/payments/${ref}/refund`, { method: 'POST', body: JSON.stringify(payload) }),
   simulatePayment: (ref, payload) =>
     request(`/payments/${ref}/simulate`, { method: 'POST', body: JSON.stringify(payload) }),
   stats: () => request('/payments/stats'),

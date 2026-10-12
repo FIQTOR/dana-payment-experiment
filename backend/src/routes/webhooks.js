@@ -1,6 +1,10 @@
 import { Router } from 'express';
-import { handleDanaNotification } from '../controllers/webhookController.js';
+import {
+  handleDanaNotification,
+  handleDisbursementNotification,
+} from '../controllers/webhookController.js';
 import { loadKey } from '../utils/signature.js';
+import { usingDb } from '../store/transactions.js';
 import config from '../config/index.js';
 
 const router = Router();
@@ -11,7 +15,13 @@ const router = Router();
  */
 router.post('/dana', handleDanaNotification);
 
-/** Health/inspection endpoint to showcase the current payment configuration. */
+/**
+ * DANA disbursement (transfer-to-bank) notification endpoint.
+ * Configure in the dashboard under "Disburse to Bank Notify URL".
+ */
+router.post('/disburse', handleDisbursementNotification);
+
+/** Health/inspection endpoint to showcase the current configuration. */
 router.get('/config', (_req, res) => {
   res.json({
     success: true,
@@ -25,10 +35,14 @@ router.get('/config', (_req, res) => {
       storeId: config.dana.storeId,
       channelId: config.dana.channelId,
       notificationUrl: `${config.dana.publicBaseUrl}/api/webhooks/dana`,
+      disburseNotifyUrl: `${config.dana.publicBaseUrl}/api/webhooks/disburse`,
       // Check the actual files exist, not just that a path is configured.
       hasPrivateKey: Boolean(loadKey(config.dana.privateKeyPath)),
       hasPublicKey: Boolean(loadKey(config.dana.publicKeyPath)),
-      hasClientSecret: Boolean(config.dana.clientSecret && config.dana.clientSecret !== 'change_me_client_secret'),
+      hasClientSecret: Boolean(
+        config.dana.clientSecret && config.dana.clientSecret !== 'change_me_client_secret',
+      ),
+      storage: usingDb() ? 'mysql' : 'memory',
     },
   });
 });

@@ -177,6 +177,108 @@ class DanaService {
     return data;
   }
 
+  /**
+   * Refund a settled (SUCCESS) transaction.
+   * DANA endpoint: POST /v1.0/debit/refund
+   */
+  async refundTransaction(input) {
+    const relPath = '/v1.0/debit/refund';
+    const body = {
+      partnerRefundNo: input.partnerReferenceNo,
+      originalPartnerReferenceNo: input.originalPartnerReferenceNo,
+      originalReferenceNo: input.originalReferenceNo,
+      merchantId: config.dana.merchantId,
+      refundAmount: {
+        value: Number(input.amount.value).toFixed(2),
+        currency: input.amount.currency || 'IDR',
+      },
+      reason: input.reason || 'Merchant refund',
+    };
+
+    if (config.mockMode) {
+      return {
+        responseCode: '2005800',
+        responseMessage: 'Successful',
+        refundNo: nanoid(16).toUpperCase(),
+        partnerRefundNo: input.partnerReferenceNo,
+        refundAmount: body.refundAmount,
+      };
+    }
+
+    const { accessToken } = await this.getAccessToken();
+    const { headers, dataString } = this.buildSignedRequest('POST', relPath, body, accessToken);
+    const { data } = await this.client.post(relPath, dataString, { headers });
+    return data;
+  }
+
+  /**
+   * Disburse (transfer) funds to a bank account.
+   * DANA endpoint: POST /v1.0/disbursement/bank-account-inquiry + /transfer
+   * Here we implement the transfer call; inquiry can be added similarly.
+   */
+  async disburseToBank(input) {
+    const relPath = '/v1.0/disbursement/transfer';
+    const body = {
+      partnerReferenceNo: input.partnerReferenceNo,
+      merchantId: config.dana.merchantId,
+      bankAccountNo: input.bankAccountNo,
+      bankCode: input.bankCode,
+      amount: {
+        value: Number(input.amount.value).toFixed(2),
+        currency: input.amount.currency || 'IDR',
+      },
+      beneficiaryName: input.beneficiaryName,
+      remark: input.remark || 'Disbursement',
+      notifyUrl: `${config.dana.publicBaseUrl}/api/webhooks/disburse`,
+    };
+
+    if (config.mockMode) {
+      return {
+        responseCode: '2006700',
+        responseMessage: 'Successful',
+        referenceNo: nanoid(16).toUpperCase(),
+        partnerReferenceNo: input.partnerReferenceNo,
+        amount: body.amount,
+        bankCode: input.bankCode,
+        bankAccountNo: input.bankAccountNo,
+      };
+    }
+
+    const { accessToken } = await this.getAccessToken();
+    const { headers, dataString } = this.buildSignedRequest('POST', relPath, body, accessToken);
+    const { data } = await this.client.post(relPath, dataString, { headers });
+    return data;
+  }
+
+  /**
+   * Look up a bank account holder name.
+   * DANA endpoint: POST /v1.0/disbursement/bank-account-inquiry
+   */
+  async inquireBankAccount(input) {
+    const relPath = '/v1.0/disbursement/bank-account-inquiry';
+    const body = {
+      partnerReferenceNo: `INQ-${Date.now()}`,
+      merchantId: config.dana.merchantId,
+      bankCode: input.bankCode,
+      bankAccountNo: input.bankAccountNo,
+    };
+
+    if (config.mockMode) {
+      return {
+        responseCode: '2006800',
+        responseMessage: 'Successful',
+        accountName: 'BUDI SANTOSO',
+        bankCode: input.bankCode,
+        bankAccountNo: input.bankAccountNo,
+      };
+    }
+
+    const { accessToken } = await this.getAccessToken();
+    const { headers, dataString } = this.buildSignedRequest('POST', relPath, body, accessToken);
+    const { data } = await this.client.post(relPath, dataString, { headers });
+    return data;
+  }
+
   // ------------------------------------------------------------------ mock ---
 
   _mockGenerate(body) {

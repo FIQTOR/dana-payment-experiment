@@ -5,6 +5,8 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg" alt="Node >= 20">
+  <a href="https://github.com/FIQTOR/dana-payment-experiment/actions/workflows/ci.yml"><img src="https://github.com/FIQTOR/dana-payment-experiment/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/tests-41%20passing-success.svg" alt="Tests">
   <img src="https://img.shields.io/badge/express-4.x-000000.svg" alt="Express 4">
   <img src="https://img.shields.io/badge/react-19-61dafb.svg" alt="React 19">
   <img src="https://img.shields.io/badge/vite-8-646cff.svg" alt="Vite 8">
@@ -14,8 +16,9 @@
 </p>
 
 > 💳 An **experimental** full-stack playground for the **DANA Business API**
-> (Indonesian SNAP/QRIS standard) — create QRIS payments, poll status, receive
-> webhooks, and watch a live operator dashboard update in real time.
+> (Indonesian SNAP/QRIS standard) — create QRIS payments, poll status, refund,
+> disburse to bank, receive webhooks, and watch a live operator dashboard update
+> in real time.
 >
 > 🧪 Ships in **mock mode** by default, so you can explore the entire payment
 > lifecycle **without any credentials**.
@@ -30,10 +33,14 @@
 - [🧰 Tech stack](#-tech-stack)
 - [🚀 Quick start](#-quick-start)
 - [🔁 Payment lifecycle](#-payment-lifecycle)
+- [💾 Persistence (MySQL)](#-persistence-mysql)
+- [🐳 Docker](#-docker)
+- [🔎 Connection self-test](#-connection-self-test)
 - [🔐 Going live (sandbox / production)](#-going-live-sandbox--production)
 - [📡 API reference](#-api-reference)
 - [🗂 Project structure](#-project-structure)
 - [🧪 Available scripts](#-available-scripts)
+- [✅ Testing](#-testing)
 - [🤝 Contributing](#-contributing)
 - [⚠️ Disclaimer](#️-disclaimer)
 - [📄 License](#-license)
@@ -44,9 +51,9 @@
 
 | Area | What you get |
 | --- | --- |
-| **Backend** | Express.js REST API · **SNAP request signing** (RSA-SHA256) · **HMAC-SHA512** access-token flow · QRIS MPM create / query / cancel · webhook receiver with signature verification · Server-Sent Events for live updates · zod validation · in-memory store (no DB) |
-| **Frontend** | React 19 + Vite 8 + **TailwindCSS v4** + **Tabler Icons** · dashboard with live stats · payment creator with QR preview · filterable transaction list · detail modal (QR / timeline / query / cancel / simulation) · webhook tester |
-| **DX** | **Mock mode** (no network) · keypair generator · hot reload on both sides · one command to run everything · CI workflow included |
+| **Backend** | Express.js REST API · **SNAP request signing** (RSA-SHA256) · **HMAC-SHA512** access-token flow · QRIS MPM create / query / cancel · **refund** · **bank disbursement** · webhook receiver with signature verification · Server-Sent Events for live updates · zod validation · rate limiting + helmet · **in-memory or MySQL (Sequelize)** storage |
+| **Frontend** | React 19 + Vite 8 + **TailwindCSS v4** + **Tabler Icons** · dashboard with live stats · payment creator with QR preview · filterable transaction list · detail modal (QR / timeline / query / cancel / refund / simulation) · webhook tester |
+| **DX** | **Mock mode** (no network) · **`npm run dana:ping`** self-test · keypair generator · **41 automated tests** (Vitest + Supertest) · Docker Compose · Postman collection · hot reload · CI workflow |
 
 ---
 
@@ -140,6 +147,74 @@ Then open **<http://localhost:5173>** 🎉
 2. **Display** → dashboard shows the QR, amount, and validity window.
 3. **Pay** → via *Experiment controls* (`POST /:ref/simulate`) in mock mode, or a real DANA webhook.
 4. **Update** → the dashboard reflects the new status instantly over SSE; stats recompute.
+5. **Refund / Disburse** → refund a settled payment, or transfer funds to a bank account.
+
+---
+
+## 💾 Persistence (MySQL)
+
+By default the project uses an **in-memory store** (zero setup). To persist
+transactions across restarts, enable **MySQL via Sequelize**:
+
+```bash
+# 1. Have a MySQL server running, then create the database:
+#    CREATE DATABASE dana_payments CHARACTER SET utf8mb4;
+
+# 2. Enable it in backend/.env
+DB_ENABLED=true
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=dana_payments
+DB_USER=root
+DB_PASSWORD=yourpassword
+```
+
+On boot the schema is created/updated automatically (`sequelize.sync`). Check the
+active backend any time:
+
+```bash
+curl -s http://localhost:4000/api/webhooks/config | jq .data.storage
+# → "mysql"  or  "memory"
+```
+
+> If the DB is enabled but unreachable, the app logs the error and **falls back to
+> in-memory** so it still starts.
+
+---
+
+## 🐳 Docker
+
+Run the whole stack (MySQL + backend + frontend) with one command:
+
+```bash
+docker compose up --build
+# frontend → http://localhost:8080
+# backend  → http://localhost:4000
+# mysql    → localhost:3306
+```
+
+DANA credentials are passed through from your shell environment:
+
+```bash
+DANA_MOCK_MODE=false \
+DANA_PARTNER_ID=... DANA_CLIENT_ID=... DANA_CLIENT_SECRET=... \
+PUBLIC_BASE_URL=https://<tunnel> \
+docker compose up --build
+```
+
+---
+
+## 🔎 Connection self-test
+
+Before blaming your integration, validate your setup:
+
+```bash
+cd backend
+npm run dana:ping
+```
+
+It checks config, key validity, a sign/verify round-trip, and (in live mode)
+requests a real access token — printing **exactly** what passed or failed.
 
 ---
 
@@ -201,6 +276,9 @@ curl -s http://localhost:4000/api/webhooks/config | jq
 Look for `"mockMode": false`, `"hasPrivateKey": true`, `"hasPublicKey": true`,
 and `"hasClientSecret": true`.
 
+📖 Full walkthrough: [`docs/SANDBOX-SETUP.md`](docs/SANDBOX-SETUP.md) ·
+SNAP details: [`docs/DANA-API-MAPPING.md`](docs/DANA-API-MAPPING.md)
+
 ---
 
 ## 📡 API reference
@@ -217,16 +295,28 @@ Base URL: `http://localhost:4000/api`
 | `GET` | `/payments/:ref/qr.svg` | QR image (SVG) |
 | `POST` | `/payments/:ref/query` | Poll DANA for the latest status |
 | `POST` | `/payments/:ref/cancel` | Cancel a pending payment |
+| `POST` | `/payments/:ref/refund` | Refund a settled (SUCCESS) payment |
 | `POST` | `/payments/:ref/simulate` | 🧪 Force a status (mock mode only) |
 | `GET` | `/payments/stats` | Aggregate stats |
+
+### Disbursements
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/disbursements` | Transfer funds to a bank account |
+| `POST` | `/disbursements/inquiry` | Look up a bank account holder name |
 
 ### Webhooks & events
 
 | Method | Endpoint | Description |
 | --- | --- | --- |
-| `POST` | `/webhooks/dana` | DANA async notification receiver (signature-verified) |
-| `GET` | `/webhooks/config` | Current configuration & key status |
+| `POST` | `/webhooks/dana` | DANA payment notification (signature-verified) |
+| `POST` | `/webhooks/disburse` | DANA disbursement notification |
+| `GET` | `/webhooks/config` | Current configuration, key status & storage backend |
 | `GET` | `/events` | Server-Sent Events stream (live updates) |
+
+> 📮 A ready-to-import **Postman collection** lives at
+> [`docs/postman_collection.json`](docs/postman_collection.json).
 
 <details>
 <summary><b>Example — create a payment</b></summary>
@@ -263,27 +353,36 @@ dana-payment-experiment/
 │   ├── certs/                    # RSA keys (gitignored)
 │   ├── src/
 │   │   ├── config/               # Env-aware configuration
-│   │   ├── controllers/          # Payment + webhook handlers
+│   │   ├── controllers/          # Payment, disbursement + webhook handlers
+│   │   ├── db/                   # Sequelize (MySQL) models & connection
 │   │   ├── middlewares/          # Error handling, raw-body capture
-│   │   ├── routes/               # /api/payments, /api/webhooks
+│   │   ├── routes/               # /api/payments, /disbursements, /webhooks
+│   │   ├── scripts/              # danaPing.js (connection self-test)
 │   │   ├── services/             # DANA API client (SNAP)
-│   │   ├── store/                # In-memory store + event bus
+│   │   ├── store/                # Store (memory or MySQL) + event bus
 │   │   ├── utils/                # signature, qr, genKeyPair
 │   │   └── server.js
+│   ├── tests/                    # Vitest + Supertest
+│   ├── Dockerfile
 │   └── .env.example
 │
 ├── frontend/                     # React + Vite + Tailwind v4
-│   └── src/
-│       ├── components/           # UI building blocks (9 components)
-│       ├── hooks/                # useTransactionEvents (SSE)
-│       ├── lib/                  # api client + formatters
-│       └── App.jsx
+│   ├── src/
+│   │   ├── components/           # UI building blocks
+│   │   ├── hooks/                # useTransactionEvents (SSE)
+│   │   ├── lib/                  # api client + formatters
+│   │   └── App.jsx
+│   ├── Dockerfile
+│   └── nginx.conf
 │
 ├── docs/
 │   ├── DANA-API-MAPPING.md       # how code maps to DANA SNAP endpoints
+│   ├── SANDBOX-SETUP.md          # step-by-step sandbox guide
+│   ├── postman_collection.json   # import-ready API collection
 │   └── screenshots/
 │
-└── .github/workflows/ci.yml      # lint + build + smoke test
+├── docker-compose.yml            # MySQL + backend + frontend
+└── .github/workflows/ci.yml      # lint + build + tests + smoke test
 ```
 
 ---
@@ -297,6 +396,8 @@ dana-payment-experiment/
 | `npm run dev` | Run backend **and** frontend together |
 | `npm run install:all` | Install backend + frontend deps |
 | `npm run keygen` | Generate an RSA keypair |
+| `npm run dana:ping` | Run the DANA connection self-test |
+| `npm test` | Run the backend test suite |
 | `npm run build` | Build the frontend |
 | `npm run lint` | Lint the frontend |
 
@@ -307,6 +408,9 @@ dana-payment-experiment/
 | `npm run dev` | Start with file watching |
 | `npm start` | Start once |
 | `npm run gen-key` | Generate an RSA-2048 keypair |
+| `npm run dana:ping` | Validate config, keys & DANA connectivity |
+| `npm test` | Run tests once (Vitest) |
+| `npm run test:watch` | Run tests in watch mode |
 
 **Frontend** (`cd frontend`)
 
@@ -319,6 +423,28 @@ dana-payment-experiment/
 
 ---
 
+## ✅ Testing
+
+41 tests covering signature math, the store, and every endpoint (via Supertest):
+
+```bash
+cd backend
+npm test
+```
+
+```
+ ✓ tests/signature.test.js   (8 tests)
+ ✓ tests/store.test.js       (9 tests)
+ ✓ tests/api.test.js         (24 tests)
+
+ Test Files  3 passed (3)
+      Tests  41 passed (41)
+```
+
+The suite runs fully **offline in mock mode** — no credentials or network needed.
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) and the
@@ -326,11 +452,11 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) and th
 
 Ideas that would make great first PRs:
 
-- 🧾 Add the **refund** endpoint (`/v1.0/debit/refund`)
-- 🏦 Add **disbursement** to bank (`/v1.0/disbursement/...`)
-- 🔑 Persist transactions in **SQLite/Postgres** instead of memory
+- 🧑💼 Add an **operator authentication** layer
+- 🔔 Add **balance inquiry** (`/v1.0/emoney/balance-inquiry`)
+- 📦 Add **database migrations** (replace `sync({ alter })`)
 - 📸 Real UI screenshots via Playwright
-- 🧪 Automated tests (Vitest / Supertest)
+- 🌐 Internationalization (EN/ID)
 
 ---
 

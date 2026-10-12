@@ -1,0 +1,147 @@
+{
+  "info": {
+    "name": "DANA Payment Experiment Lab",
+    "description": "Collection for the DANA Business API payment experiment backend. Base URL defaults to http://localhost:4000. Run in mock mode for offline testing.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "ref", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Info",
+      "item": [
+        {
+          "name": "Service descriptor",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/", "host": ["{{baseUrl}}"] } }
+        },
+        {
+          "name": "Config & key status",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/webhooks/config", "host": ["{{baseUrl}}"], "path": ["api", "webhooks", "config"] } }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Create payment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.partnerReferenceNo) {",
+                  "  pm.collectionVariables.set('ref', json.data.partnerReferenceNo);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 25000,\n  \"description\": \"Kopi Susu Gula Aren x2\",\n  \"validUpToMinutes\": 30\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/payments", "host": ["{{baseUrl}}"], "path": ["api", "payments"] }
+          }
+        },
+        {
+          "name": "List payments",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/payments?limit=50", "host": ["{{baseUrl}}"], "path": ["api", "payments"], "query": [{ "key": "limit", "value": "50" }] } }
+        },
+        {
+          "name": "Get payment",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/payments/{{ref}}", "host": ["{{baseUrl}}"], "path": ["api", "payments", "{{ref}}"] } }
+        },
+        {
+          "name": "QR SVG",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/payments/{{ref}}/qr.svg", "host": ["{{baseUrl}}"], "path": ["api", "payments", "{{ref}}", "qr.svg"] } }
+        },
+        {
+          "name": "Query status",
+          "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/api/payments/{{ref}}/query", "host": ["{{baseUrl}}"], "path": ["api", "payments", "{{ref}}", "query"] } }
+        },
+        {
+          "name": "Simulate SUCCESS (mock only)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"SUCCESS\", \"payerName\": \"Budi\" }" },
+            "url": { "raw": "{{baseUrl}}/api/payments/{{ref}}/simulate", "host": ["{{baseUrl}}"], "path": ["api", "payments", "{{ref}}", "simulate"] }
+          }
+        },
+        {
+          "name": "Refund",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"reason\": \"customer request\" }" },
+            "url": { "raw": "{{baseUrl}}/api/payments/{{ref}}/refund", "host": ["{{baseUrl}}"], "path": ["api", "payments", "{{ref}}", "refund"] }
+          }
+        },
+        {
+          "name": "Cancel",
+          "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/api/payments/{{ref}}/cancel", "host": ["{{baseUrl}}"], "path": ["api", "payments", "{{ref}}", "cancel"] } }
+        },
+        {
+          "name": "Stats",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/payments/stats", "host": ["{{baseUrl}}"], "path": ["api", "payments", "stats"] } }
+        }
+      ]
+    },
+    {
+      "name": "Disbursements",
+      "item": [
+        {
+          "name": "Bank account inquiry",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"bankCode\": \"BCA\", \"bankAccountNo\": \"1234567890\" }" },
+            "url": { "raw": "{{baseUrl}}/api/disbursements/inquiry", "host": ["{{baseUrl}}"], "path": ["api", "disbursements", "inquiry"] }
+          }
+        },
+        {
+          "name": "Create disbursement",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"bankCode\": \"BCA\",\n  \"bankAccountNo\": \"1234567890\",\n  \"beneficiaryName\": \"Budi Santoso\",\n  \"amount\": 50000\n}" },
+            "url": { "raw": "{{baseUrl}}/api/disbursements", "host": ["{{baseUrl}}"], "path": ["api", "disbursements"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "DANA payment notification",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partnerReferenceNo\": \"{{ref}}\",\n  \"originalReferenceNo\": \"20260101123456789\",\n  \"latestTransactionStatus\": \"SUCCESS\",\n  \"amount\": { \"value\": \"25000.00\", \"currency\": \"IDR\" },\n  \"additionalInfo\": { \"payer\": { \"name\": \"Budi\", \"accountNo\": \"08123456789\" } }\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/webhooks/dana", "host": ["{{baseUrl}}"], "path": ["api", "webhooks", "dana"] }
+          }
+        },
+        {
+          "name": "DANA disbursement notification",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"partnerReferenceNo\": \"DSB-1\", \"latestTransactionStatus\": \"SUCCESS\" }" },
+            "url": { "raw": "{{baseUrl}}/api/webhooks/disburse", "host": ["{{baseUrl}}"], "path": ["api", "webhooks", "disburse"] }
+          }
+        }
+      ]
+    }
+  ]
+}

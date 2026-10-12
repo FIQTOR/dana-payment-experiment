@@ -25,7 +25,7 @@ jobs:
       - run: npm run build
 
   backend:
-    name: Backend (syntax check)
+    name: Backend (tests + smoke)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -41,6 +41,8 @@ jobs:
       - name: Syntax check all source files
         run: |
           for f in $(find src -name '*.js'); do node --check "$f"; done
+      - name: Run tests (Vitest)
+        run: npm test
       - name: Boot server (smoke test, mock mode)
         run: |
           DANA_MOCK_MODE=true node src/server.js &

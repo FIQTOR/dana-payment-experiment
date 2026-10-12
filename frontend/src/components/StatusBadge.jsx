@@ -4,6 +4,7 @@ import {
   IconCircleX,
   IconBan,
   IconHourglassHigh,
+  IconReceiptRefund,
 } from '@tabler/icons-react';
 
 const MAP = {
@@ -36,6 +37,12 @@ const MAP = {
     icon: IconBan,
     cls: 'bg-slate-100 text-slate-600 ring-slate-200',
     dot: 'bg-slate-400',
+  },
+  REFUNDED: {
+    label: 'Refunded',
+    icon: IconReceiptRefund,
+    cls: 'bg-violet-50 text-violet-700 ring-violet-200',
+    dot: 'bg-violet-500',
   },
 };
 

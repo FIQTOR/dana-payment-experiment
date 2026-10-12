@@ -3,7 +3,7 @@ import { formatIDR, formatDateTime } from '../lib/api';
 import StatusBadge from './StatusBadge';
 
 export default function TransactionList({ transactions, onOpen, filter, onFilter, loading }) {
-  const filters = ['ALL', 'PENDING', 'SUCCESS', 'FAILED', 'CANCELLED'];
+  const filters = ['ALL', 'PENDING', 'SUCCESS', 'REFUNDED', 'FAILED', 'CANCELLED'];
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white shadow-card">

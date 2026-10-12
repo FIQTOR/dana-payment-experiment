@@ -10,6 +10,7 @@ import {
   IconBan,
   IconCheck,
   IconX,
+  IconReceiptRefund,
 } from '@tabler/icons-react';
 import Modal from './Modal';
 import StatusBadge from './StatusBadge';
@@ -53,6 +54,7 @@ export default function PaymentDetailModal({ open, onClose, transaction, onUpdat
       let res;
       if (kind === 'query') res = await api.queryPayment(t.partnerReferenceNo);
       else if (kind === 'cancel') res = await api.cancelPayment(t.partnerReferenceNo);
+      else if (kind === 'refund') res = await api.refundPayment(t.partnerReferenceNo, { reason: 'Refund from dashboard' });
       else if (kind === 'simulate-success')
         res = await api.simulatePayment(t.partnerReferenceNo, { status: 'SUCCESS', payerName: 'Test Payer' });
       else if (kind === 'simulate-failed')
@@ -62,6 +64,7 @@ export default function PaymentDetailModal({ open, onClose, transaction, onUpdat
       const updated = res?.data?.transaction || res?.data;
       if (updated) onUpdate?.(updated);
       if (kind === 'query') toast('Status refreshed from DANA.', 'info');
+      else if (kind === 'refund') toast('Payment refunded.', 'success');
       else toast('Transaction updated.', 'success');
     } catch (err) {
       toast(err.message, 'error');
@@ -105,6 +108,16 @@ export default function PaymentDetailModal({ open, onClose, transaction, onUpdat
             >
               {busy === 'cancel' ? <IconLoader2 size={16} className="animate-spin" /> : <IconBan size={16} />}
               Cancel
+            </button>
+          )}
+          {t.status === 'SUCCESS' && (
+            <button
+              onClick={() => action('refund')}
+              disabled={busy}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-100 disabled:opacity-60"
+            >
+              {busy === 'refund' ? <IconLoader2 size={16} className="animate-spin" /> : <IconReceiptRefund size={16} />}
+              Refund
             </button>
           )}
         </div>

@@ -7,6 +7,7 @@ import {
   listPayments,
   paymentStats,
   queryPayment,
+  refundPayment,
   simulatePayment,
 } from '../controllers/paymentController.js';
 
@@ -20,6 +21,7 @@ router.get('/:ref', getPayment);
 router.get('/:ref/qr.svg', getPaymentQr);
 router.post('/:ref/query', queryPayment);
 router.post('/:ref/cancel', cancelPayment);
+router.post('/:ref/refund', refundPayment);
 router.post('/:ref/simulate', simulatePayment); // experiment-only
 
 export default router;

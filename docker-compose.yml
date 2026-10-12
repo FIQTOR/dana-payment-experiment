@@ -1,0 +1,66 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: dana-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: dana_payments
+      MYSQL_USER: dana
+      MYSQL_PASSWORD: danapass
+    ports:
+      - '3306:3306'
+    volumes:
+      - dana-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-prootpass']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    container_name: dana-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      NODE_ENV: production
+      CORS_ORIGIN: http://localhost:8080
+      # --- DANA (mock by default; fill in for sandbox) ---
+      DANA_MOCK_MODE: 'true'
+      DANA_BASE_URL: https://api.sandbox.dana.id
+      DANA_PARTNER_ID: ${DANA_PARTNER_ID:-YOUR_PARTNER_ID}
+      DANA_CLIENT_ID: ${DANA_CLIENT_ID:-YOUR_CLIENT_ID}
+      DANA_CLIENT_SECRET: ${DANA_CLIENT_SECRET:-YOUR_CLIENT_SECRET}
+      DANA_MERCHANT_ID: ${DANA_MERCHANT_ID:-YOUR_MERCHANT_ID}
+      DANA_STORE_ID: ${DANA_STORE_ID:-YOUR_STORE_ID}
+      DANA_CHANNEL_ID: ${DANA_CHANNEL_ID:-95221}
+      DANA_PRIVATE_KEY_PATH: /app/certs/private_key.pem
+      DANA_PUBLIC_KEY_PATH: /app/certs/dana_public_key.pem
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:4000}
+      # --- Persistence ---
+      DB_ENABLED: 'true'
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: dana_payments
+      DB_USER: dana
+      DB_PASSWORD: danapass
+    volumes:
+      - ./backend/certs:/app/certs:ro
+    ports:
+      - '4000:4000'
+
+  frontend:
+    build: ./frontend
+    container_name: dana-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - '8080:80'
+
+volumes:
+  dana-mysql-data:

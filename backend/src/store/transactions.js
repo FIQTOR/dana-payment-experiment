@@ -1,35 +1,73 @@
 import { EventEmitter } from 'node:events';
 import { nanoid } from 'nanoid';
+import { isDbEnabled, getTransactionModel } from '../db/sequelize.js';
 
 /**
- * A tiny in-memory transaction store with an event bus.
- * Suitable for local experimentation. Swap for a real DB in production.
+ * Transaction store with an event bus and two interchangeable backends:
  *
- * Transaction shape:
+ *   - in-memory (default)  — zero setup, perfect for experiments
+ *   - MySQL via Sequelize  — set DB_ENABLED=true to persist across restarts
+ *
+ * All functions are async so callers work identically with either backend.
+ *
+ * Transaction shape (both backends):
  * {
- *   id, merchantRefNo, danaReferenceNo, partnerReferenceNo,
- *   amount: { value, currency },
- *   status, // PENDING | SUCCESS | FAILED | EXPIRED | CANCELLED
- *   qrContent, qrUrl, validUntil, payer, createdAt, updatedAt, history[]
+ *   id, partnerReferenceNo, merchantRefNo, danaReferenceNo,
+ *   amount: { value: number, currency: string },
+ *   status, // PENDING | SUCCESS | FAILED | EXPIRED | CANCELLED | REFUNDED
+ *   qrContent, qrUrl, validUntil, payer, description, createdAt, updatedAt, history[]
  * }
  */
 export const store = new EventEmitter();
 
-const transactions = new Map(); // keyed by partnerReferenceNo
+const transactions = new Map(); // used only when DB is disabled
+
+/** True when the MySQL backend is active. */
+export function usingDb() {
+  return isDbEnabled();
+}
+
+// ----------------------------------------------------------- serialization ---
+
+/** DB row -> plain transaction object (matches the in-memory shape). */
+function rowToTxn(row) {
+  const j = row.get ? row.get({ plain: true }) : row;
+  return {
+    id: j.id,
+    partnerReferenceNo: j.partnerReferenceNo,
+    merchantRefNo: j.merchantRefNo,
+    danaReferenceNo: j.danaReferenceNo,
+    amount: { value: Number(j.amountValue), currency: j.currency },
+    status: j.status,
+    qrContent: j.qrContent,
+    qrUrl: j.qrUrl,
+    validUntil: j.validUntil ? new Date(j.validUntil).toISOString() : null,
+    payer: j.payer || null,
+    description: j.description,
+    createdAt: new Date(j.createdAt).toISOString(),
+    updatedAt: new Date(j.updatedAt).toISOString(),
+    history: Array.isArray(j.history) ? j.history : [],
+  };
+}
+
+// -------------------------------------------------------------- operations ---
 
 /**
- * Create a transaction. Does NOT emit an event yet — callers should attach any
- * extra data (e.g. the QR payload) and then call `emitCreated` so subscribers
- * receive the COMPLETE transaction rather than a half-populated one.
+ * Create a transaction. Does NOT emit an event — callers attach extra data
+ * (e.g. the QR payload) then call `emitCreated` so subscribers receive the
+ * COMPLETE transaction rather than a half-populated one.
  */
-export function createTransaction(input, { silent = true } = {}) {
+export async function createTransaction(input, { silent = true } = {}) {
   const now = new Date().toISOString();
   const txn = {
     id: nanoid(),
     partnerReferenceNo: input.partnerReferenceNo,
     merchantRefNo: input.merchantRefNo || input.partnerReferenceNo,
     danaReferenceNo: null,
-    amount: input.amount,
+    amount: {
+      value: Number(input.amount.value),
+      currency: input.amount.currency || 'IDR',
+    },
     status: 'PENDING',
     qrContent: null,
     qrUrl: null,
@@ -40,23 +78,58 @@ export function createTransaction(input, { silent = true } = {}) {
     updatedAt: now,
     history: [{ status: 'PENDING', at: now, note: 'Transaction created' }],
   };
+
+  if (usingDb()) {
+    const Model = getTransactionModel();
+    const created = await Model.create({
+      id: txn.id,
+      partnerReferenceNo: txn.partnerReferenceNo,
+      merchantRefNo: txn.merchantRefNo,
+      amountValue: txn.amount.value,
+      currency: txn.amount.currency,
+      status: txn.status,
+      validUntil: txn.validUntil,
+      description: txn.description,
+      history: txn.history,
+    });
+    const result = rowToTxn(created);
+    if (!silent) store.emit('transaction:created', result);
+    return result;
+  }
+
   transactions.set(txn.partnerReferenceNo, txn);
   if (!silent) store.emit('transaction:created', txn);
   return txn;
 }
 
 /** Explicitly announce a freshly-created (and fully-populated) transaction. */
-export function emitCreated(partnerReferenceNo) {
-  const txn = transactions.get(partnerReferenceNo);
+export async function emitCreated(partnerReferenceNo) {
+  const txn = await getTransaction(partnerReferenceNo);
   if (txn) store.emit('transaction:created', txn);
-  return txn || null;
+  return txn;
 }
 
-export function getTransaction(partnerReferenceNo) {
+export async function getTransaction(partnerReferenceNo) {
+  if (usingDb()) {
+    const Model = getTransactionModel();
+    const row = await Model.findOne({ where: { partnerReferenceNo } });
+    return row ? rowToTxn(row) : null;
+  }
   return transactions.get(partnerReferenceNo) || null;
 }
 
-export function listTransactions({ status, limit = 50 } = {}) {
+export async function listTransactions({ status, limit = 50 } = {}) {
+  if (usingDb()) {
+    const Model = getTransactionModel();
+    const where = status ? { status } : undefined;
+    const rows = await Model.findAll({
+      where,
+      order: [['createdAt', 'DESC']],
+      limit,
+    });
+    return rows.map(rowToTxn);
+  }
+
   let all = [...transactions.values()].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
   );
@@ -66,10 +139,48 @@ export function listTransactions({ status, limit = 50 } = {}) {
 
 /**
  * Patch a transaction. Emits `transaction:updated` whenever anything changed
- * (not only on status transitions) so subscribers always stay in sync — e.g.
- * when the QR payload is attached a moment after creation.
+ * (not only on status transitions) so subscribers always stay in sync.
  */
-export function updateTransaction(partnerReferenceNo, patch, note, { silent = false } = {}) {
+export async function updateTransaction(
+  partnerReferenceNo,
+  patch,
+  note,
+  { silent = false } = {},
+) {
+  if (usingDb()) {
+    const Model = getTransactionModel();
+    const row = await Model.findOne({ where: { partnerReferenceNo } });
+    if (!row) return null;
+
+    const current = rowToTxn(row);
+    const changed = Object.keys(patch).some(
+      (k) => JSON.stringify(current[k]) !== JSON.stringify(patch[k]),
+    );
+    const now = new Date().toISOString();
+
+    const updates = {};
+    if (patch.status !== undefined) updates.status = patch.status;
+    if (patch.danaReferenceNo !== undefined) updates.danaReferenceNo = patch.danaReferenceNo;
+    if (patch.qrContent !== undefined) updates.qrContent = patch.qrContent;
+    if (patch.qrUrl !== undefined) updates.qrUrl = patch.qrUrl;
+    if (patch.payer !== undefined) updates.payer = patch.payer;
+    if (patch.description !== undefined) updates.description = patch.description;
+
+    let history = current.history;
+    if (patch.status) {
+      history = [...history, { status: patch.status, at: now, note: note || '' }];
+      updates.history = history;
+    }
+
+    await row.update(updates);
+    const result = rowToTxn(await Model.findOne({ where: { partnerReferenceNo } }));
+
+    if (!silent && (changed || patch.status)) {
+      store.emit('transaction:updated', result);
+    }
+    return result;
+  }
+
   const txn = transactions.get(partnerReferenceNo);
   if (!txn) return null;
 
@@ -86,7 +197,27 @@ export function updateTransaction(partnerReferenceNo, patch, note, { silent = fa
   return txn;
 }
 
-export function stats() {
+export async function stats() {
+  if (usingDb()) {
+    const Model = getTransactionModel();
+    const rows = await Model.findAll({ attributes: ['status', 'amountValue', 'currency'] });
+    const byStatus = rows.reduce((acc, r) => {
+      const s = r.get('status');
+      acc[s] = (acc[s] || 0) + 1;
+      return acc;
+    }, {});
+    const successValue = rows
+      .filter((r) => r.get('status') === 'SUCCESS')
+      .reduce((sum, r) => sum + Number(r.get('amountValue') || 0), 0);
+    return {
+      total: rows.length,
+      byStatus,
+      successValue,
+      currency: rows[0]?.get('currency') || 'IDR',
+      backend: 'mysql',
+    };
+  }
+
   const all = [...transactions.values()];
   const byStatus = all.reduce((acc, t) => {
     acc[t.status] = (acc[t.status] || 0) + 1;
@@ -100,5 +231,16 @@ export function stats() {
     byStatus,
     successValue,
     currency: all[0]?.amount?.currency || 'IDR',
+    backend: 'memory',
   };
+}
+
+/** Clear all data — used by tests. */
+export async function _reset() {
+  if (usingDb()) {
+    const Model = getTransactionModel();
+    await Model.destroy({ where: {}, truncate: true });
+    return;
+  }
+  transactions.clear();
 }
