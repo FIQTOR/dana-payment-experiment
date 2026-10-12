@@ -59,6 +59,10 @@
 
 ## 🖼 Screenshots
 
+> These are high-fidelity **UI mockups** (embedded as SVG). The QR codes are
+> **real, scannable** QRIS payloads and the DANA mark is the official brand logo.
+> Regenerate them with `npm run screenshots --prefix backend`.
+
 ### Dashboard — live stats, transactions & payment creator
 ![Dashboard](docs/screenshots/dashboard.svg)
 
@@ -466,7 +470,10 @@ This project is provided for **educational and experimental purposes only**.
 
 - It is **not affiliated with, endorsed by, or connected to** DANA or
   PT Espay Debit Indonesia Koe.
-- **DANA** and its logo are trademarks of their respective owners.
+- **DANA** and its logo are trademarks of their respective owners. The DANA logo
+  is used here only to reference the API being integrated (nominative fair use).
+  Source: [dana.id](https://dana.id/) via Wikimedia Commons (public domain /
+  simple geometric text-logo).
 - You are responsible for complying with DANA's terms, sandbox usage policies,
   and all applicable financial regulations.
 - **Never commit real private keys or client secrets.** This repo runs in mock

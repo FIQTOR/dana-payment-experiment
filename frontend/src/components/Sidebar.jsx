@@ -1,5 +1,4 @@
 import {
-  IconWallet,
   IconLayoutDashboard,
   IconPlus,
   IconListDetails,
@@ -7,6 +6,7 @@ import {
   IconBrandGithub,
   IconSpeakerphone,
 } from '@tabler/icons-react';
+import danaLogo from '../assets/dana-logo.svg';
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: IconLayoutDashboard },
@@ -19,13 +19,11 @@ export default function Sidebar({ active, onChange, connected }) {
   return (
     <aside className="flex h-full w-full flex-col gap-2 border-slate-200 bg-white p-4 lg:w-64 lg:border-r">
       {/* Brand */}
-      <div className="mb-2 flex items-center gap-3 px-2 py-2">
-        <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-dana-500 to-accent-500 text-white shadow-sm">
-          <IconWallet size={22} stroke={2.2} />
-        </span>
+      <div className="mb-2 flex flex-col gap-2 px-2 py-2">
+        <img src={danaLogo} alt="DANA" className="h-7 w-auto" />
         <div>
-          <p className="text-sm font-bold leading-tight text-slate-900">DANA Pay</p>
-          <p className="text-xs text-slate-500">Experiment Lab</p>
+          <p className="text-sm font-bold leading-tight text-slate-900">Experiment Lab</p>
+          <p className="text-xs text-slate-500">DANA Business API</p>
         </div>
       </div>
 
