@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="400" viewBox="0 0 1280 400" font-family="Inter, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b6fd1"/>
+      <stop offset="0.5" stop-color="#118eea"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="400" rx="0" fill="url(#hero)"/>
+  <circle cx="1130" cy="80" r="220" fill="url(#glow)"/>
+  <circle cx="120" cy="360" r="180" fill="url(#glow)"/>
+
+  <!-- logo mark -->
+  <rect x="80" y="96" width="72" height="72" rx="20" fill="#ffffff" opacity="0.16"/>
+  <text x="116" y="146" font-size="40" fill="#fff" text-anchor="middle" font-weight="800">D</text>
+
+  <text x="80" y="216" font-size="46" fill="#ffffff" font-weight="800">DANA Pay · Experiment Lab</text>
+  <text x="80" y="256" font-size="20" fill="#e0f2fe">Experimental full-stack playground for the DANA Business API (SNAP)</text>
+
+  <!-- feature pills -->
+  <g font-size="15" font-weight="600">
+    <rect x="80" y="288" width="188" height="42" rx="21" fill="#ffffff" opacity="0.14"/>
+    <text x="174" y="314" fill="#fff" text-anchor="middle">⚡ Express.js API</text>
+    <rect x="282" y="288" width="228" height="42" rx="21" fill="#ffffff" opacity="0.14"/>
+    <text x="396" y="314" fill="#fff" text-anchor="middle">⚛ React · Vite · Tailwind v4</text>
+    <rect x="524" y="288" width="196" height="42" rx="21" fill="#ffffff" opacity="0.14"/>
+    <text x="622" y="314" fill="#fff" text-anchor="middle">🔐 SNAP Signatures</text>
+    <rect x="734" y="288" width="150" height="42" rx="21" fill="#ffffff" opacity="0.14"/>
+    <text x="809" y="314" fill="#fff" text-anchor="middle">📲 QRIS / Webhooks</text>
+  </g>
+</svg>

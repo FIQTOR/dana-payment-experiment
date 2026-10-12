@@ -1,0 +1,29 @@
+{
+  "name": "dana-payment-backend",
+  "version": "1.0.0",
+  "description": "Experimental DANA Business API payment integration backend (Express.js)",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "gen-key": "node src/utils/genKeyPair.js"
+  },
+  "keywords": [
+    "dana",
+    "payment",
+    "snap",
+    "qris",
+    "express"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "nanoid": "^5.0.9",
+    "zod": "^3.24.1"
+  }
+}

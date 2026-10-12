@@ -1,0 +1,84 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------
+   Tailwind CSS v4 — design tokens live directly in CSS via @theme.
+   These become utilities like bg-dana, text-dana, etc.
+------------------------------------------------------------------ */
+@theme {
+  /* DANA brand palette */
+  --color-dana-50: #eef4ff;
+  --color-dana-100: #d9e5ff;
+  --color-dana-200: #bcd0ff;
+  --color-dana-300: #8eb0ff;
+  --color-dana-400: #5985ff;
+  --color-dana-500: #118eea;
+  --color-dana-600: #0b6fd1;
+  --color-dana-700: #0957a8;
+  --color-dana-800: #0d4a85;
+  --color-dana-900: #11406e;
+
+  /* Accent (DANA blue-ish gradient partner) */
+  --color-accent-400: #38bdf8;
+  --color-accent-500: #0ea5e9;
+  --color-accent-600: #0284c7;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --radius-xl2: 1.25rem;
+
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px -8px rgba(16, 24, 40, 0.12);
+}
+
+/* Base tweaks */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-slate-50 text-slate-800 antialiased;
+}
+
+/* Thin, subtle scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-slate-300;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400;
+}
+
+/* Pulsing "live" dot for the status badge */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+.live-dot {
+  animation: pulse-ring 2s infinite;
+}
+
+/* Fade-in for list items / cards */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.35s ease-out both;
+}

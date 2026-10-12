@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Inter, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#118eea"/><stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+  <!-- app background -->
+  <rect width="1440" height="900" fill="#f8fafc"/>
+
+  <!-- sidebar -->
+  <rect x="0" y="0" width="256" height="900" fill="#ffffff"/>
+  <line x1="256" y1="0" x2="256" y2="900" stroke="#e2e8f0"/>
+  <!-- brand -->
+  <rect x="24" y="28" width="40" height="40" rx="12" fill="url(#brand)"/>
+  <text x="44" y="53" font-size="20" fill="#fff" text-anchor="middle" font-weight="700">D</text>
+  <text x="76" y="45" font-size="14" fill="#0f172a" font-weight="700">DANA Pay</text>
+  <text x="76" y="61" font-size="12" fill="#64748b">Experiment Lab</text>
+  <!-- nav active -->
+  <rect x="16" y="104" width="224" height="42" rx="12" fill="#eef4ff" stroke="#bcd0ff"/>
+  <circle cx="40" cy="125" r="4" fill="#118eea"/>
+  <text x="58" y="130" font-size="14" fill="#0957a8" font-weight="600">Dashboard</text>
+  <!-- nav items -->
+  <text x="58" y="180" font-size="14" fill="#475569">Create Payment</text>
+  <circle cx="40" cy="175" r="3" fill="#cbd5e1"/>
+  <text x="58" y="228" font-size="14" fill="#475569">Transactions</text>
+  <circle cx="40" cy="223" r="3" fill="#cbd5e1"/>
+  <text x="58" y="276" font-size="14" fill="#475569">Webhook Tester</text>
+  <circle cx="40" cy="271" r="3" fill="#cbd5e1"/>
+  <!-- sidebar footer -->
+  <rect x="16" y="820" width="224" height="44" rx="12" fill="#f8fafc"/>
+  <circle cx="40" cy="842" r="4" fill="#10b981"/>
+  <text x="58" y="847" font-size="12" fill="#475569" font-weight="600">Live stream connected</text>
+
+  <!-- topbar -->
+  <rect x="256" y="0" width="1184" height="66" fill="#ffffff"/>
+  <line x1="256" y1="66" x2="1440" y2="66" stroke="#e2e8f0"/>
+  <text x="288" y="34" font-size="18" fill="#0f172a" font-weight="700">Payment Dashboard</text>
+  <text x="288" y="52" font-size="12" fill="#64748b">DANA Business API · experimental integration</text>
+  <!-- refresh btn -->
+  <rect x="1156" y="18" width="96" height="32" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="1204" y="38" font-size="13" fill="#475569" text-anchor="middle">↻ Refresh</text>
+  <!-- new btn -->
+  <rect x="1264" y="18" width="80" height="32" rx="10" fill="url(#brand)"/>
+  <text x="1304" y="38" font-size="13" fill="#fff" text-anchor="middle" font-weight="600">+ New</text>
+  <!-- mode badge -->
+  <rect x="1000" y="18" width="140" height="32" rx="16" fill="#ecfdf5" stroke="#a7f3d0"/>
+  <text x="1070" y="38" font-size="12" fill="#047857" text-anchor="middle" font-weight="600">✓ Sandbox mode</text>
+
+  <!-- stat cards -->
+  <g>
+    <rect x="288" y="94" width="268" height="84" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="304" y="110" width="44" height="44" rx="12" fill="#eef4ff"/>
+    <text x="326" y="138" font-size="20" text-anchor="middle">💳</text>
+    <text x="364" y="126" font-size="12" fill="#64748b">Total Transactions</text>
+    <text x="364" y="150" font-size="20" fill="#0f172a" font-weight="700">12</text>
+  </g>
+  <g>
+    <rect x="572" y="94" width="268" height="84" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="588" y="110" width="44" height="44" rx="12" fill="#ecfdf5"/>
+    <text x="610" y="138" font-size="20" text-anchor="middle">✅</text>
+    <text x="648" y="126" font-size="12" fill="#64748b">Successful</text>
+    <text x="648" y="150" font-size="20" fill="#0f172a" font-weight="700">9</text>
+  </g>
+  <g>
+    <rect x="856" y="94" width="268" height="84" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="872" y="110" width="44" height="44" rx="12" fill="#fffbeb"/>
+    <text x="894" y="138" font-size="20" text-anchor="middle">⏱</text>
+    <text x="932" y="126" font-size="12" fill="#64748b">Pending</text>
+    <text x="932" y="150" font-size="20" fill="#0f172a" font-weight="700">2</text>
+  </g>
+  <g>
+    <rect x="1140" y="94" width="268" height="84" rx="16" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="1156" y="110" width="44" height="44" rx="12" fill="#f5f3ff"/>
+    <text x="1178" y="138" font-size="20" text-anchor="middle">🪙</text>
+    <text x="1216" y="126" font-size="12" fill="#64748b">Collected</text>
+    <text x="1216" y="150" font-size="18" fill="#0f172a" font-weight="700">Rp 1.240.000</text>
+  </g>
+
+  <!-- transactions list -->
+  <rect x="288" y="202" width="700" height="600" rx="16" fill="#fff" stroke="#e2e8f0"/>
+  <text x="312" y="236" font-size="14" fill="#1e293b" font-weight="700">Transactions</text>
+  <rect x="428" y="222" width="30" height="18" rx="9" fill="#f1f5f9"/>
+  <text x="443" y="235" font-size="11" fill="#64748b" text-anchor="middle">12</text>
+  <!-- filters -->
+  <rect x="700" y="220" width="46" height="22" rx="8" fill="#0f172a"/><text x="723" y="235" font-size="11" fill="#fff" text-anchor="middle">all</text>
+  <rect x="750" y="220" width="70" height="22" rx="8" fill="#f1f5f9"/><text x="785" y="235" font-size="11" fill="#475569" text-anchor="middle">pending</text>
+  <rect x="824" y="220" width="72" height="22" rx="8" fill="#f1f5f9"/><text x="860" y="235" font-size="11" fill="#475569" text-anchor="middle">success</text>
+  <line x1="288" y1="256" x2="988" y2="256" stroke="#f1f5f9"/>
+
+  <!-- rows -->
+  <g font-size="13">
+    <!-- row template repeated -->
+    <g>
+      <rect x="304" y="272" width="40" height="40" rx="12" fill="#f1f5f9"/><text x="324" y="298" font-size="16" text-anchor="middle">▦</text>
+      <text x="360" y="290" fill="#1e293b" font-weight="600">Kopi Susu Gula Aren x2</text>
+      <text x="360" y="308" font-size="11" fill="#94a3b8">PRN-...-KSCUM · 12 Oct, 22:10</text>
+      <text x="820" y="290" fill="#0f172a" font-weight="700" text-anchor="end">Rp 25.000</text>
+      <text x="820" y="308" font-size="11" fill="#94a3b8" text-anchor="end">0812•••789</text>
+      <rect x="876" y="284" width="88" height="24" rx="12" fill="#ecfdf5" stroke="#a7f3d0"/><text x="920" y="300" font-size="11" fill="#047857" text-anchor="middle" font-weight="600">✓ Success</text>
+    </g>
+    <line x1="304" y1="336" x2="972" y2="336" stroke="#f1f5f9"/>
+    <g>
+      <rect x="304" y="352" width="40" height="40" rx="12" fill="#f1f5f9"/><text x="324" y="378" font-size="16" text-anchor="middle">▦</text>
+      <text x="360" y="370" fill="#1e293b" font-weight="600">Nasi Goreng Spesial</text>
+      <text x="360" y="388" font-size="11" fill="#94a3b8">PRN-...-LD3PSJ · 12 Oct, 22:05</text>
+      <text x="820" y="370" fill="#0f172a" font-weight="700" text-anchor="end">Rp 50.000</text>
+      <text x="820" y="388" font-size="11" fill="#94a3b8" text-anchor="end">—</text>
+      <rect x="876" y="364" width="88" height="24" rx="12" fill="#fffbeb" stroke="#fde68a"/><text x="920" y="380" font-size="11" fill="#b45309" text-anchor="middle" font-weight="600">⏱ Pending</text>
+    </g>
+    <line x1="304" y1="416" x2="972" y2="416" stroke="#f1f5f9"/>
+    <g>
+      <rect x="304" y="432" width="40" height="40" rx="12" fill="#f1f5f9"/><text x="324" y="458" font-size="16" text-anchor="middle">▦</text>
+      <text x="360" y="450" fill="#1e293b" font-weight="600">Es Teh Manis</text>
+      <text x="360" y="468" font-size="11" fill="#94a3b8">PRN-...-SU90PU · 12 Oct, 21:58</text>
+      <text x="820" y="450" fill="#0f172a" font-weight="700" text-anchor="end">Rp 12.000</text>
+      <text x="820" y="468" font-size="11" fill="#94a3b8" text-anchor="end">—</text>
+      <rect x="876" y="444" width="88" height="24" rx="12" fill="#f1f5f9" stroke="#e2e8f0"/><text x="920" y="460" font-size="11" fill="#475569" text-anchor="middle" font-weight="600">⊘ Cancelled</text>
+    </g>
+    <line x1="304" y1="496" x2="972" y2="496" stroke="#f1f5f9"/>
+    <g>
+      <rect x="304" y="512" width="40" height="40" rx="12" fill="#f1f5f9"/><text x="324" y="538" font-size="16" text-anchor="middle">▦</text>
+      <text x="360" y="530" fill="#1e293b" font-weight="600">Ayam Bakar Paket 1</text>
+      <text x="360" y="548" font-size="11" fill="#94a3b8">PRN-...-FMDHUT · 12 Oct, 21:40</text>
+      <text x="820" y="530" fill="#0f172a" font-weight="700" text-anchor="end">Rp 65.000</text>
+      <text x="820" y="548" font-size="11" fill="#94a3b8" text-anchor="end">0813•••221</text>
+      <rect x="876" y="524" width="88" height="24" rx="12" fill="#ecfdf5" stroke="#a7f3d0"/><text x="920" y="540" font-size="11" fill="#047857" text-anchor="middle" font-weight="600">✓ Success</text>
+    </g>
+    <line x1="304" y1="576" x2="972" y2="576" stroke="#f1f5f9"/>
+    <g>
+      <rect x="304" y="592" width="40" height="40" rx="12" fill="#f1f5f9"/><text x="324" y="618" font-size="16" text-anchor="middle">▦</text>
+      <text x="360" y="610" fill="#1e293b" font-weight="600">Pembayaran pesanan</text>
+      <text x="360" y="628" font-size="11" fill="#94a3b8">PRN-...-PTNC-S · 12 Oct, 21:12</text>
+      <text x="820" y="610" fill="#0f172a" font-weight="700" text-anchor="end">Rp 99.000</text>
+      <text x="820" y="628" font-size="11" fill="#94a3b8" text-anchor="end">0812•••010</text>
+      <rect x="876" y="604" width="88" height="24" rx="12" fill="#fff1f2" stroke="#fecdd3"/><text x="920" y="620" font-size="11" fill="#be123c" text-anchor="middle" font-weight="600">✕ Failed</text>
+    </g>
+  </g>
+
+  <!-- create form card -->
+  <rect x="1004" y="202" width="404" height="600" rx="16" fill="#fff" stroke="#e2e8f0"/>
+  <text x="1028" y="240" font-size="14" fill="#1e293b" font-weight="700">Create Payment</text>
+  <text x="1028" y="270" font-size="12" fill="#64748b">Amount (IDR)</text>
+  <rect x="1028" y="280" width="356" height="42" rx="12" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="1044" y="306" font-size="14" fill="#0f172a" font-weight="600">Rp  25.000</text>
+  <!-- preset chips -->
+  <g font-size="11">
+    <rect x="1028" y="332" width="70" height="24" rx="8" fill="#f1f5f9"/><text x="1063" y="348" fill="#475569" text-anchor="middle">Rp 10rb</text>
+    <rect x="1104" y="332" width="70" height="24" rx="8" fill="#118eea"/><text x="1139" y="348" fill="#fff" text-anchor="middle">Rp 25rb</text>
+    <rect x="1180" y="332" width="70" height="24" rx="8" fill="#f1f5f9"/><text x="1215" y="348" fill="#475569" text-anchor="middle">Rp 50rb</text>
+    <rect x="1256" y="332" width="70" height="24" rx="8" fill="#f1f5f9"/><text x="1291" y="348" fill="#475569" text-anchor="middle">Rp 100rb</text>
+  </g>
+  <text x="1028" y="392" font-size="12" fill="#64748b">Description</text>
+  <rect x="1028" y="402" width="356" height="42" rx="12" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="1044" y="428" font-size="13" fill="#0f172a">Pembayaran pesanan</text>
+  <text x="1028" y="474" font-size="12" fill="#64748b">Valid for (minutes)</text>
+  <rect x="1028" y="484" width="356" height="42" rx="12" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="1044" y="510" font-size="13" fill="#0f172a">30</text>
+  <!-- submit -->
+  <rect x="1028" y="546" width="356" height="46" rx="12" fill="url(#brand)"/>
+  <text x="1206" y="574" font-size="14" fill="#fff" text-anchor="middle" font-weight="600">▦  Generate QRIS Payment</text>
+  <!-- qr preview -->
+  <rect x="1028" y="610" width="356" height="172" rx="16" fill="#f8fafc" stroke="#e2e8f0"/>
+  <rect x="1150" y="624" width="112" height="112" rx="18" fill="url(#brand)"/>
+  <text x="1206" y="692" font-size="44" fill="#fff" text-anchor="middle">▦</text>
+  <text x="1206" y="762" font-size="12" fill="#64748b" text-anchor="middle">Live QRIS · valid 30 min</text>
+</svg>

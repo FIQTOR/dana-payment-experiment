@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Inter, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="brand3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#118eea"/><stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1440" height="900" fill="#f8fafc"/>
+
+  <!-- sidebar -->
+  <rect x="0" y="0" width="256" height="900" fill="#ffffff"/>
+  <line x1="256" y1="0" x2="256" y2="900" stroke="#e2e8f0"/>
+  <rect x="24" y="28" width="40" height="40" rx="12" fill="url(#brand3)"/>
+  <text x="44" y="53" font-size="20" fill="#fff" text-anchor="middle" font-weight="700">D</text>
+  <text x="76" y="45" font-size="14" fill="#0f172a" font-weight="700">DANA Pay</text>
+  <text x="76" y="61" font-size="12" fill="#64748b">Experiment Lab</text>
+  <text x="58" y="130" font-size="14" fill="#475569">Dashboard</text><circle cx="40" cy="125" r="3" fill="#cbd5e1"/>
+  <text x="58" y="178" font-size="14" fill="#475569">Create Payment</text><circle cx="40" cy="173" r="3" fill="#cbd5e1"/>
+  <text x="58" y="226" font-size="14" fill="#475569">Transactions</text><circle cx="40" cy="221" r="3" fill="#cbd5e1"/>
+  <rect x="16" y="252" width="224" height="42" rx="12" fill="#eef4ff" stroke="#bcd0ff"/>
+  <circle cx="40" cy="273" r="4" fill="#118eea"/>
+  <text x="58" y="278" font-size="14" fill="#0957a8" font-weight="600">Webhook Tester</text>
+  <rect x="16" y="820" width="224" height="44" rx="12" fill="#f8fafc"/>
+  <circle cx="40" cy="842" r="4" fill="#10b981"/>
+  <text x="58" y="847" font-size="12" fill="#475569" font-weight="600">Live stream connected</text>
+
+  <!-- topbar -->
+  <rect x="256" y="0" width="1184" height="66" fill="#ffffff"/>
+  <line x1="256" y1="66" x2="1440" y2="66" stroke="#e2e8f0"/>
+  <text x="288" y="34" font-size="18" fill="#0f172a" font-weight="700">Webhook Tester</text>
+  <text x="288" y="52" font-size="12" fill="#64748b">DANA Business API · experimental integration</text>
+  <rect x="1264" y="18" width="80" height="32" rx="10" fill="url(#brand3)"/>
+  <text x="1304" y="38" font-size="13" fill="#fff" text-anchor="middle" font-weight="600">+ New</text>
+
+  <!-- left card: notification endpoint -->
+  <rect x="288" y="98" width="560" height="320" rx="16" fill="#fff" stroke="#e2e8f0"/>
+  <rect x="312" y="122" width="40" height="40" rx="12" fill="#ede9fe"/>
+  <text x="332" y="148" font-size="18" text-anchor="middle">📢</text>
+  <text x="364" y="138" font-size="14" fill="#1e293b" font-weight="700">Notification endpoint</text>
+  <text x="364" y="156" font-size="12" fill="#64748b">Configure this URL in the DANA dashboard</text>
+  <rect x="312" y="182" width="512" height="46" rx="12" fill="#0f172a"/>
+  <text x="330" y="209" font-size="12" fill="#6ee7b7" font-family="monospace">https://xxxx.trycloudflare.com/api/webhooks/dana</text>
+  <rect x="782" y="190" width="30" height="30" rx="8" fill="#1e293b"/>
+  <text x="797" y="210" font-size="14" text-anchor="middle">⧉</text>
+  <text x="312" y="256" font-size="12" fill="#64748b">Method</text>
+  <text x="366" y="256" font-size="12" fill="#334155" font-family="monospace" font-weight="600">POST</text>
+  <text x="404" y="256" font-size="12" fill="#64748b">· content-type</text>
+  <text x="492" y="256" font-size="12" fill="#334155" font-family="monospace" font-weight="600">application/json</text>
+  <text x="312" y="280" font-size="12" fill="#64748b">DANA signs callbacks with RSA-SHA256 (verify with your DANA public key).</text>
+  <rect x="312" y="300" width="330" height="30" rx="10" fill="#f1f5f9"/>
+  <text x="330" y="320" font-size="12" fill="#475569">✓ Use latest ref: PRN-...-KSCUM</text>
+
+  <!-- right card: payload -->
+  <rect x="872" y="98" width="536" height="700" rx="16" fill="#fff" stroke="#e2e8f0"/>
+  <text x="896" y="134" font-size="14" fill="#1e293b" font-weight="700">⌨  Test payload</text>
+  <rect x="896" y="152" width="488" height="420" rx="12" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="912" y="182" font-size="12" fill="#64748b" font-family="monospace">{</text>
+  <text x="928" y="204" font-size="12" fill="#0f766e" font-family="monospace">"partnerReferenceNo"</text><text x="1092" y="204" font-size="12" fill="#64748b" font-family="monospace">: "PRN-...-KSCUM",</text>
+  <text x="928" y="226" font-size="12" fill="#0f766e" font-family="monospace">"originalReferenceNo"</text><text x="1100" y="226" font-size="12" fill="#64748b" font-family="monospace">: "20261012...",</text>
+  <text x="928" y="248" font-size="12" fill="#0f766e" font-family="monospace">"latestTransactionStatus"</text><text x="1134" y="248" font-size="12" fill="#64748b" font-family="monospace">: "SUCCESS",</text>
+  <text x="928" y="270" font-size="12" fill="#0f766e" font-family="monospace">"amount"</text><text x="1000" y="270" font-size="12" fill="#64748b" font-family="monospace">: { "value": "25000.00", "currency": "IDR" },</text>
+  <text x="928" y="292" font-size="12" fill="#0f766e" font-family="monospace">"additionalInfo"</text><text x="1052" y="292" font-size="12" fill="#64748b" font-family="monospace">: {</text>
+  <text x="944" y="314" font-size="12" fill="#0f766e" font-family="monospace">"payer"</text><text x="1008" y="314" font-size="12" fill="#64748b" font-family="monospace">: { "name": "Budi", "accountNo": "0812..." }</text>
+  <text x="928" y="336" font-size="12" fill="#64748b" font-family="monospace">}</text>
+  <text x="912" y="356" font-size="12" fill="#64748b" font-family="monospace">}</text>
+
+  <!-- buttons -->
+  <rect x="896" y="592" width="360" height="44" rx="12" fill="url(#brand3)"/>
+  <text x="1076" y="619" font-size="13" fill="#fff" text-anchor="middle" font-weight="600">➤  Send notification</text>
+  <rect x="1268" y="592" width="116" height="44" rx="12" fill="#fff" stroke="#e2e8f0"/>
+  <text x="1326" y="619" font-size="13" fill="#475569" text-anchor="middle" font-weight="600">Reset</text>
+
+  <!-- response -->
+  <rect x="896" y="652" width="488" height="118" rx="12" fill="#ecfdf5" stroke="#a7f3d0"/>
+  <text x="916" y="680" font-size="12" fill="#065f46" font-weight="700">HTTP 200 · accepted</text>
+  <text x="916" y="704" font-size="12" fill="#334155" font-family="monospace">{</text>
+  <text x="932" y="724" font-size="12" fill="#0f766e" font-family="monospace">"responseCode"</text><text x="1064" y="724" font-size="12" fill="#64748b" font-family="monospace">: "2002500",</text>
+  <text x="932" y="744" font-size="12" fill="#0f766e" font-family="monospace">"responseMessage"</text><text x="1088" y="744" font-size="12" fill="#64748b" font-family="monospace">: "Successful"</text>
+  <text x="916" y="762" font-size="12" fill="#334155" font-family="monospace">}</text>
+</svg>
